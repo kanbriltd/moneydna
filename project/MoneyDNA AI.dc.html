@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#05070e;color:#e8edf6;font-family:'Manrope',sans-serif;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.09);border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
+  @keyframes mdFloat{0%{transform:translateY(0) translateX(0)}50%{transform:translateY(-26px) translateX(10px)}100%{transform:translateY(0) translateX(0)}}
+  @keyframes mdTwinkle{0%,100%{opacity:.25}50%{opacity:1}}
+  @keyframes mdFadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes mdGlowPulse{0%,100%{opacity:.5}50%{opacity:.95}}
+  @keyframes mdGridMove{from{background-position:0 0}to{background-position:60px 60px}}
+  @keyframes mdSpin{to{transform:rotate(360deg)}}
+  @keyframes mdSheen{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}}
+  @keyframes mdDash{to{stroke-dashoffset:0}}
+  @keyframes mdBlink{0%,100%{opacity:1}50%{opacity:.15}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;width:100%;position:relative;overflow-x:hidden;background:radial-gradient(1200px 700px at 80% -10%,rgba(46,99,247,.16),transparent 60%),radial-gradient(900px 600px at 0% 100%,rgba(52,211,153,.12),transparent 55%),#05070e;font-family:'Manrope',sans-serif;color:#e8edf6">
+
+  <!-- ambient grid -->
+  <div style="position:fixed;inset:0;pointer-events:none;opacity:.5;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;animation:mdGridMove 22s linear infinite"></div>
+
+  <!-- ============ LANDING ============ -->
+  <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+  <div style="position:relative;z-index:2">
+    {{ particles }}
+    <!-- nav -->
+    <div style="max-width:1180px;margin:0 auto;padding:26px 32px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2f81f7,#34d399);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#05070e;box-shadow:0 0 22px rgba(52,211,153,.45)">M</div>
+        <span style="font-family:'Space Grotesk';font-weight:600;font-size:18px;letter-spacing:.3px">MoneyDNA<span style="color:#34d399"> AI</span></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:26px;font-size:14px;color:#8a97ad">
+        <span style="cursor:pointer">Product</span>
+        <span style="cursor:pointer">Security</span>
+        <span style="cursor:pointer">Pricing</span>
+        <button onClick="{{ goUpload }}" style="cursor:pointer;font-family:'Manrope';font-weight:600;font-size:14px;color:#e8edf6;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:9px 16px;border-radius:10px">Open app</button>
+      </div>
+    </div>
+
+    <!-- hero -->
+    <div style="max-width:1000px;margin:0 auto;padding:64px 32px 30px;text-align:center;position:relative">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.22);font-size:12.5px;color:#7fe9c4;font-family:'JetBrains Mono';letter-spacing:.5px;margin-bottom:30px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;animation:mdGlowPulse 2s infinite"></span>FINANCIAL INTELLIGENCE · FOR EVERYONE
+      </div>
+      <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:62px;line-height:1.04;letter-spacing:-1.5px;margin-bottom:22px">Your money tells a story.<br><span style="background:linear-gradient(110deg,#2f81f7,#34d399 55%,#a371f7);-webkit-background-clip:text;background-clip:text;color:transparent">MoneyDNA reveals it.</span></h1>
+      <p style="max-width:620px;margin:0 auto 38px;font-size:18px;line-height:1.6;color:#9aa7bd">Drop in your M-PESA or bank statement. In seconds our AI extracts every transaction, decodes your spending DNA, forecasts cashflow, and coaches you toward a stronger saving culture.</p>
+      <div style="display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap">
+        <button onClick="{{ goUpload }}" style="cursor:pointer;font-family:'Manrope';font-weight:700;font-size:15.5px;color:#05070e;background:linear-gradient(135deg,#34d399,#2f81f7);border:none;padding:15px 28px;border-radius:13px;box-shadow:0 10px 30px rgba(52,211,153,.3),0 0 0 1px rgba(255,255,255,.08) inset;display:flex;align-items:center;gap:10px">Analyze my statement <span style="font-size:18px">→</span></button>
+        <button onClick="{{ goDemo }}" style="cursor:pointer;font-family:'Manrope';font-weight:600;font-size:15px;color:#e8edf6;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);padding:15px 24px;border-radius:13px">View live demo</button>
+      </div>
+      <div style="margin-top:20px;font-size:12.5px;color:#5f6b80;font-family:'JetBrains Mono'">🔒 Processed privately · no statement stored by default</div>
+    </div>
+
+    <!-- floating glass preview strip -->
+    <div style="max-width:980px;margin:48px auto 0;padding:0 32px">
+      <div style="position:relative;border-radius:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.55));border:1px solid rgba(255,255,255,.08);box-shadow:0 40px 120px rgba(0,0,0,.5);overflow:hidden;backdrop-filter:blur(14px)">
+        <div style="position:absolute;top:0;left:0;height:100%;width:34%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);animation:mdSheen 5.5s linear infinite;pointer-events:none"></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.06)">
+          <div style="background:#0b1220;padding:22px 20px"><div style="font-size:11.5px;color:#7fe9c4;font-family:'JetBrains Mono';letter-spacing:.5px;margin-bottom:8px">SAVINGS RATE</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:30px;color:#34d399">26%</div><div style="font-size:12px;color:#5f6b80;margin-top:4px">above 20% benchmark</div></div>
+          <div style="background:#0b1220;padding:22px 20px"><div style="font-size:11.5px;color:#9aa7bd;font-family:'JetBrains Mono';letter-spacing:.5px;margin-bottom:8px">HEALTH SCORE</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:30px">78<span style="font-size:15px;color:#5f6b80">/100</span></div><div style="font-size:12px;color:#5f6b80;margin-top:4px">strong & stable</div></div>
+          <div style="background:#0b1220;padding:22px 20px"><div style="font-size:11.5px;color:#9aa7bd;font-family:'JetBrains Mono';letter-spacing:.5px;margin-bottom:8px">NET CASHFLOW</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:30px;color:#7fb4ff">+337K</div><div style="font-size:12px;color:#5f6b80;margin-top:4px">this month</div></div>
+          <div style="background:#0b1220;padding:22px 20px"><div style="font-size:11.5px;color:#9aa7bd;font-family:'JetBrains Mono';letter-spacing:.5px;margin-bottom:8px">DNA TYPE</div><div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#c4a8ff;line-height:1.15;margin-top:4px">Disciplined<br>Builder</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- features -->
+    <div style="max-width:1120px;margin:80px auto 0;padding:0 32px">
+      <div style="text-align:center;margin-bottom:44px">
+        <div style="font-family:'JetBrains Mono';font-size:12.5px;color:#34d399;letter-spacing:1px;margin-bottom:12px">WHAT YOU GET</div>
+        <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:34px;letter-spacing:-.5px">A command center for your money</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+        <sc-for list="{{ features }}" as="f" hint-placeholder-count="6">
+          <div style="background:linear-gradient(180deg,rgba(17,24,39,.6),rgba(10,16,28,.4));border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:26px 24px;animation:mdFadeUp .6s both">
+            <div style="width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px;background:rgba(47,129,247,.1);border:1px solid rgba(255,255,255,.08)">{{ f.icon }}</div>
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:18px;margin-bottom:9px">{{ f.title }}</div>
+            <div style="font-size:14px;line-height:1.6;color:#8a97ad">{{ f.body }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="max-width:1120px;margin:64px auto 0;padding:0 32px 80px">
+      <div style="border-radius:22px;padding:48px 40px;text-align:center;background:radial-gradient(700px 300px at 50% 0%,rgba(52,211,153,.16),transparent 70%),linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(52,211,153,.18)">
+        <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.5px;margin-bottom:14px">Ready to meet your money?</h2>
+        <p style="color:#9aa7bd;font-size:16px;margin-bottom:26px">It takes one statement and about ten seconds.</p>
+        <button onClick="{{ goUpload }}" style="cursor:pointer;font-family:'Manrope';font-weight:700;font-size:15.5px;color:#05070e;background:linear-gradient(135deg,#34d399,#2f81f7);border:none;padding:15px 30px;border-radius:13px;box-shadow:0 10px 30px rgba(52,211,153,.3)">Upload statement →</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============ UPLOAD FLOW ============ -->
+  <sc-if value="{{ isUpload }}" hint-placeholder-val="{{ true }}">
+  <div style="position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px">
+    <div style="position:absolute;top:24px;left:32px;display:flex;align-items:center;gap:11px;cursor:pointer" onClick="{{ goLanding }}">
+      <div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2f81f7,#34d399);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#05070e;font-size:15px">M</div>
+      <span style="font-family:'Space Grotesk';font-weight:600">MoneyDNA<span style="color:#34d399"> AI</span></span>
+    </div>
+
+    <sc-if value="{{ uploadIdle }}" hint-placeholder-val="{{ true }}">
+    <div style="width:100%;max-width:560px;text-align:center;animation:mdFadeUp .5s both">
+      <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.5px;margin-bottom:10px">Upload your statement</h2>
+      <p style="color:#8a97ad;font-size:15px;margin-bottom:30px">M-PESA · Bank · SACCO · Credit card — PDF, CSV or Excel</p>
+      <input ref="{{ fileRef }}" type="file" accept=".pdf,.csv,.xls,.xlsx,application/pdf,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange="{{ onFilePicked }}" style="display:none" />
+      <div onClick="{{ openFilePicker }}" onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onFileDrop }}" style="cursor:pointer;border:1.5px dashed {{ dropBorder }};border-radius:20px;padding:50px 30px;background:{{ dropBg }};transition:.18s" style-hover="border-color:rgba(52,211,153,.7);background:rgba(52,211,153,.05)">
+        <div style="width:66px;height:66px;margin:0 auto 20px;border-radius:18px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);display:flex;align-items:center;justify-content:center;font-size:30px">📄</div>
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:18px;margin-bottom:6px">{{ dropTitle }}</div>
+        <div style="color:#7a8699;font-size:13.5px">{{ dropHint }}</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+          <span style="font-size:11px;font-family:'JetBrains Mono';color:#7fe9c4;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);padding:4px 9px;border-radius:7px">PDF</span>
+          <span style="font-size:11px;font-family:'JetBrains Mono';color:#7fb4ff;background:rgba(47,129,247,.1);border:1px solid rgba(47,129,247,.2);padding:4px 9px;border-radius:7px">CSV</span>
+          <span style="font-size:11px;font-family:'JetBrains Mono';color:#c4a8ff;background:rgba(163,113,247,.1);border:1px solid rgba(163,113,247,.2);padding:4px 9px;border-radius:7px">XLS / XLSX</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;margin:26px 0;color:#5f6b80;font-size:12.5px"><div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>OR<div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div></div>
+      <button onClick="{{ runAnalysis }}" style="cursor:pointer;width:100%;font-family:'Manrope';font-weight:700;font-size:15px;color:#05070e;background:linear-gradient(135deg,#34d399,#2f81f7);border:none;padding:15px;border-radius:13px;box-shadow:0 8px 24px rgba(52,211,153,.25)">Use Wanjiru's sample M-PESA statement</button>
+      <div style="margin-top:14px;font-size:12px;color:#5f6b80;font-family:'JetBrains Mono'">Demo data · small-business owner · Nairobi</div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ uploadBusy }}" hint-placeholder-val="{{ true }}">
+    <div style="width:100%;max-width:520px;animation:mdFadeUp .4s both">
+      <div style="text-align:center;margin-bottom:36px">
+        <div style="width:84px;height:84px;margin:0 auto 24px;position:relative">
+          <div style="position:absolute;inset:0;border-radius:50%;border:3px solid rgba(255,255,255,.07)"></div>
+          <div style="position:absolute;inset:0;border-radius:50%;border:3px solid transparent;border-top-color:#34d399;border-right-color:#2f81f7;animation:mdSpin 1s linear infinite"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:22px;color:#34d399">{{ analyzePct }}</div>
+        </div>
+        <h2 style="font-family:'Space Grotesk';font-weight:700;font-size:24px;letter-spacing:-.3px">Decoding your money…</h2>
+        <p style="color:#8a97ad;font-size:14px;margin-top:6px">{{ analyzeCaption }}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:13px;background:rgba(17,24,39,.5);border:1px solid rgba(255,255,255,.06)">
+            <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:{{ s.bg }};border:1px solid {{ s.bd }};color:{{ s.fg }}">{{ s.mark }}</div>
+            <span style="font-size:14.5px;font-weight:500;color:{{ s.tc }}">{{ s.label }}</span>
+            <span style="margin-left:auto;font-family:'JetBrains Mono';font-size:12px;color:#5f6b80">{{ s.meta }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- ============ APP SHELL ============ -->
+  <sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+  <div style="position:relative;z-index:2;display:flex;min-height:100vh">
+    <!-- sidebar -->
+    <div style="width:248px;flex-shrink:0;border-right:1px solid rgba(255,255,255,.07);padding:24px 18px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;background:rgba(7,10,18,.5);backdrop-filter:blur(10px)">
+      <div onClick="{{ goLanding }}" title="Back to home" style="cursor:pointer;display:flex;align-items:center;gap:11px;padding:4px 8px 22px">
+        <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#2f81f7,#34d399);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#05070e">M</div>
+        <span style="font-family:'Space Grotesk';font-weight:600;font-size:16px">MoneyDNA<span style="color:#34d399"> AI</span></span>
+      </div>
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+        <div onClick="{{ n.go }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:11px;font-size:14.5px;font-weight:600;color:{{ n.color }};background:{{ n.bg }};border:1px solid {{ n.bd }}">
+          <span style="font-size:16px;width:20px;text-align:center">{{ n.icon }}</span>{{ n.label }}
+        </div>
+      </sc-for>
+      <div style="margin-top:auto;padding:16px;border-radius:14px;background:linear-gradient(160deg,rgba(52,211,153,.1),rgba(47,129,247,.06));border:1px solid rgba(52,211,153,.18)">
+        <div style="font-size:12px;color:#7fe9c4;font-family:'JetBrains Mono';letter-spacing:.4px;margin-bottom:7px">SAVING STREAK</div>
+        <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#34d399">🔥 4 months</div>
+        <div style="font-size:12px;color:#8a97ad;margin-top:5px;line-height:1.4">You've stayed above 20% savings since March. Keep the flame alive.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:11px;padding:12px 8px 2px">
+        <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#a371f7,#2f81f7);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:14px;color:#fff">WK</div>
+        <div><div style="font-size:13.5px;font-weight:600">Wanjiru Kamau</div><div style="font-size:11.5px;color:#7a8699">Kamau Hardware Ltd</div></div>
+      </div>
+    </div>
+
+    <!-- main -->
+    <div style="flex:1;min-width:0">
+
+      <!-- ===== DASHBOARD ===== -->
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:28px 34px 60px" data-screen-label="Dashboard">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-family:'JetBrains Mono';font-size:12.5px;color:#34d399;letter-spacing:.5px;margin-bottom:6px">COMMAND CENTER · MARCH 2026</div>
+            <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.5px">Good evening, Wanjiru 👋</h1>
+            <p style="color:#8a97ad;font-size:14.5px;margin-top:5px">Your money grew stronger this month. Net cashflow is up and your saving streak is alive.</p>
+          </div>
+          <button onClick="{{ goCoach }}" style="cursor:pointer;font-family:'Manrope';font-weight:600;font-size:14px;color:#05070e;background:linear-gradient(135deg,#34d399,#2f81f7);border:none;padding:11px 18px;border-radius:11px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 22px rgba(52,211,153,.25)">✦ Ask Wealth Coach</button>
+        </div>
+
+        <!-- KPI row -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="position:relative;overflow:hidden;border-radius:16px;padding:18px 18px 20px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+              <svg width="100%" height="3" style="position:absolute;top:0;left:0"><rect width="100%" height="3" fill="{{ k.accent }}" opacity="0.85"/></svg>
+              <div style="font-size:11.5px;color:#8a97ad;font-family:'JetBrains Mono';letter-spacing:.5px;margin-bottom:11px">{{ k.label }}</div>
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:25px;letter-spacing:-.5px;color:{{ k.vcolor }}">{{ k.value }}</div>
+              <div style="font-size:12px;color:#7a8699;margin-top:6px">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- main grid -->
+        <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:14px;margin-bottom:14px">
+          <!-- river -->
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px">Cashflow river · last 12 months</div>
+              <div style="display:flex;gap:14px;font-size:12px;color:#8a97ad">
+                <span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:#34d399"></span>Income</span>
+                <span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:#3b82f6"></span>Expenses</span>
+              </div>
+            </div>
+            <div style="margin-top:8px">{{ riverChart }}</div>
+          </div>
+          <!-- health gauge -->
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:4px">Financial health</div>
+            <div style="font-size:12.5px;color:#8a97ad">7 weighted signals</div>
+            <div style="position:relative;display:flex;align-items:center;justify-content:center;margin:8px 0 6px">
+              {{ healthGauge }}
+              <div style="position:absolute;text-align:center">
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:42px;line-height:1">{{ counters.health }}</div>
+                <div style="font-size:12px;color:#34d399;font-family:'JetBrains Mono';letter-spacing:.5px;margin-top:2px">STRONG</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px">
+              <sc-for list="{{ healthParts }}" as="h" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:9px;font-size:12.5px">
+                  <span style="color:#8a97ad;width:120px">{{ h.label }}</span>
+                  <div style="flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden"><div style="height:100%;border-radius:3px;width:{{ h.w }};background:{{ h.color }}"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- categories + savings ring + mpesa -->
+        <div style="display:grid;grid-template-columns:1.3fr .85fr .85fr;gap:14px;margin-bottom:14px">
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:18px">Where it went</div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <sc-for list="{{ categories }}" as="c" hint-placeholder-count="6">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="font-weight:500">{{ c.name }}</span><span style="font-family:'JetBrains Mono';color:#9aa7bd">{{ c.amt }}</span></div>
+                  <div style="height:7px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden"><div style="height:100%;border-radius:4px;width:{{ c.w }};background:{{ c.color }}"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;align-self:flex-start;margin-bottom:2px">Savings rate</div>
+            <div style="font-size:12.5px;color:#8a97ad;align-self:flex-start">of income kept</div>
+            <div style="position:relative;display:flex;align-items:center;justify-content:center;margin-top:14px">
+              {{ savingsRing }}
+              <div style="position:absolute;text-align:center">
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:34px;color:#34d399;line-height:1">{{ counters.savingsRate }}</div>
+                <div style="font-size:11px;color:#7a8699;margin-top:2px">target 20%</div>
+              </div>
+            </div>
+            <div style="margin-top:16px;font-size:12.5px;color:#7fe9c4;text-align:center;line-height:1.45;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.18);padding:10px 12px;border-radius:11px">You beat your target by 6 points. That's <b>KES 77K</b> kept.</div>
+          </div>
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:16px">M-PESA breakdown</div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ mpesa }}" as="m" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:8px;height:8px;border-radius:50%;background:{{ m.color }};flex-shrink:0"></span>
+                  <span style="font-size:13px;flex:1">{{ m.label }}</span>
+                  <span style="font-family:'JetBrains Mono';font-size:12.5px;color:#9aa7bd">{{ m.pct }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- merchants + anomalies -->
+        <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-bottom:14px">
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:16px">Top merchants</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ merchants }}" as="m" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:13px">
+                  <div style="width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:600;font-size:13px;color:{{ m.color }}">{{ m.rank }}</div>
+                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:500">{{ m.name }}</div><div style="font-size:11.5px;color:#7a8699">{{ m.tag }}</div></div>
+                  <div style="text-align:right"><div style="font-family:'JetBrains Mono';font-size:13px;color:#e8edf6">{{ m.amt }}</div><div style="font-size:11px;color:#7a8699">{{ m.count }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px"><div style="font-family:'Space Grotesk';font-weight:600;font-size:16px">Anomalies & alerts</div><span style="font-size:11px;font-family:'JetBrains Mono';color:#f59e0b;background:rgba(245,158,11,.12);padding:3px 8px;border-radius:6px">3 NEW</span></div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <sc-for list="{{ anomalies }}" as="a" hint-placeholder-count="3">
+                <div style="display:flex;gap:12px;padding:13px 14px;border-radius:12px;background:{{ a.bg }};border:1px solid {{ a.bd }}">
+                  <span style="width:9px;height:9px;border-radius:50%;background:{{ a.dot }};margin-top:5px;flex-shrink:0;box-shadow:0 0 9px {{ a.dot }}"></span>
+                  <div><div style="font-size:13.5px;font-weight:600;margin-bottom:3px">{{ a.title }}</div><div style="font-size:12.5px;color:#9aa7bd;line-height:1.45">{{ a.body }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- goals + insights -->
+        <div style="display:grid;grid-template-columns:1.05fr 1fr;gap:14px">
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><div style="font-family:'Space Grotesk';font-weight:600;font-size:16px">Savings goals</div><span style="font-size:12.5px;color:#34d399;cursor:pointer">+ New goal</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <sc-for list="{{ goals }}" as="g" hint-placeholder-count="4">
+                <div style="padding:15px;border-radius:13px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:17px">{{ g.icon }}</span><span style="font-size:13px;font-weight:600">{{ g.name }}</span></div>
+                  <div style="height:8px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden;margin-bottom:8px"><div style="height:100%;border-radius:5px;width:{{ g.w }};background:{{ g.color }}"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11.5px;font-family:'JetBrains Mono'"><span style="color:#9aa7bd">{{ g.have }}</span><span style="color:#5f6b80">{{ g.target }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(160deg,rgba(47,129,247,.08),rgba(10,16,28,.5));border:1px solid rgba(47,129,247,.16)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px"><span style="font-size:17px">✦</span><div style="font-family:'Space Grotesk';font-weight:600;font-size:16px">AI insights</div></div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <sc-for list="{{ insights }}" as="i" hint-placeholder-count="4">
+                <div style="display:flex;gap:11px"><span style="color:{{ i.color }};font-size:15px;line-height:1.4">●</span><div style="font-size:13.5px;line-height:1.5;color:#cdd6e4">{{ i.text }}</div></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== ANALYTICS ===== -->
+      <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:28px 34px 60px" data-screen-label="Analytics">
+        <div style="margin-bottom:24px">
+          <div style="font-family:'JetBrains Mono';font-size:12.5px;color:#a371f7;letter-spacing:.5px;margin-bottom:6px">DEEP DIVE</div>
+          <h1 style="font-family:'Space Grotesk';font-weight:700;font-size:30px;letter-spacing:-.5px">Spending DNA & flows</h1>
+          <p style="color:#8a97ad;font-size:14.5px;margin-top:5px">The shape of your money — every shilling, mapped.</p>
+        </div>
+
+        <!-- DNA + sunburst -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(160deg,rgba(163,113,247,.09),rgba(10,16,28,.5));border:1px solid rgba(163,113,247,.18)">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:2px">Your spending DNA</div>
+            <div style="font-size:12.5px;color:#8a97ad;margin-bottom:6px">Behavioural fingerprint across 7 traits</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-family:'Space Grotesk';font-weight:700;font-size:22px;color:#c4a8ff">The Disciplined Builder</span></div>
+            <div style="display:flex;justify-content:center">{{ dnaRadar }}</div>
+            <div style="font-size:13px;color:#cdd6e4;line-height:1.55;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:13px 15px;border-radius:12px;margin-top:8px">You reinvest in your business, resist impulse buys, and consistently set money aside. Your one watch-out: late-night cash withdrawals nudge your impulse score up.</div>
+          </div>
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:2px">Spending sunburst</div>
+            <div style="font-size:12.5px;color:#8a97ad;margin-bottom:6px">Categories &amp; sub-categories, by share</div>
+            <div style="display:flex;align-items:center;gap:18px">
+              <div style="flex-shrink:0">{{ sunburst }}</div>
+              <div style="display:flex;flex-direction:column;gap:9px;flex:1">
+                <sc-for list="{{ sunLegend }}" as="l" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:center;gap:9px;font-size:12.5px"><span style="width:9px;height:9px;border-radius:3px;background:{{ l.color }}"></span><span style="flex:1">{{ l.name }}</span><span style="font-family:'JetBrains Mono';color:#9aa7bd">{{ l.pct }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- sankey -->
+        <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07);margin-bottom:14px">
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:2px">Money flow — Sankey</div>
+          <div style="font-size:12.5px;color:#8a97ad;margin-bottom:10px">From income sources, through your spending, into savings</div>
+          <div style="overflow-x:auto">{{ sankey }}</div>
+        </div>
+
+        <!-- heatmap + galaxy -->
+        <div style="display:grid;grid-template-columns:1fr 1.25fr;gap:14px">
+          <div style="border-radius:18px;padding:22px;background:linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5));border:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:2px">Daily spending heatmap</div>
+            <div style="font-size:12.5px;color:#8a97ad;margin-bottom:14px">Darker green = a heavier spend day</div>
+            {{ heatmap }}
+            <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-top:12px;font-size:11.5px;color:#7a8699">Less<span style="width:11px;height:11px;border-radius:3px;background:rgba(52,211,153,.18)"></span><span style="width:11px;height:11px;border-radius:3px;background:rgba(52,211,153,.45)"></span><span style="width:11px;height:11px;border-radius:3px;background:rgba(52,211,153,.75)"></span><span style="width:11px;height:11px;border-radius:3px;background:#34d399"></span>More</div>
+          </div>
+          <div style="border-radius:18px;padding:22px;background:radial-gradient(500px 260px at 60% 40%,rgba(47,129,247,.1),transparent 70%),linear-gradient(180deg,rgba(13,18,30,.8),rgba(7,10,18,.7));border:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16px;margin-bottom:2px">Spending galaxy</div>
+            <div style="font-size:12.5px;color:#8a97ad;margin-bottom:8px">Each star is a transaction · bigger = larger spend</div>
+            {{ galaxy }}
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== COACH ===== -->
+      <sc-if value="{{ isCoach }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;height:100vh" data-screen-label="Wealth Coach">
+        <div style="padding:22px 30px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:13px">
+          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#34d399,#2f81f7);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 0 22px rgba(52,211,153,.4)">✦</div>
+          <div>
+            <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px">Wealth Coach</div>
+            <div style="font-size:12.5px;color:#34d399;display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399"></span>Reading your transaction history</div>
+          </div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:26px 30px">
+          <div style="max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px">
+            <sc-for list="{{ chat }}" as="msg" hint-placeholder-count="3">
+              <div style="display:flex;gap:12px;flex-direction:{{ msg.dir }};align-items:flex-start;align-self:{{ msg.align }};max-width:88%">
+                <div style="width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:{{ msg.avBg }};border:1px solid {{ msg.avBd }};color:{{ msg.avFg }}">{{ msg.avatar }}</div>
+                <div style="padding:14px 17px;border-radius:15px;font-size:14.5px;line-height:1.6;background:{{ msg.bubBg }};border:1px solid {{ msg.bubBd }};color:{{ msg.bubFg }}">{{ msg.html }}</div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ coachTyping }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:12px;align-self:flex-start;align-items:center">
+                <div style="width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:#34d399">✦</div>
+                <div style="padding:15px 18px;border-radius:15px;background:rgba(17,24,39,.7);border:1px solid rgba(255,255,255,.08);display:flex;gap:5px">
+                  <span style="width:7px;height:7px;border-radius:50%;background:#34d399;animation:mdBlink 1s infinite"></span>
+                  <span style="width:7px;height:7px;border-radius:50%;background:#34d399;animation:mdBlink 1s infinite .2s"></span>
+                  <span style="width:7px;height:7px;border-radius:50%;background:#34d399;animation:mdBlink 1s infinite .4s"></span>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="padding:16px 30px 24px;border-top:1px solid rgba(255,255,255,.07)">
+          <div style="max-width:760px;margin:0 auto">
+            <div style="display:flex;gap:9px;margin-bottom:13px;flex-wrap:wrap">
+              <sc-for list="{{ suggestions }}" as="q" hint-placeholder-count="4">
+                <div onClick="{{ q.ask }}" style="cursor:pointer;font-size:12.5px;padding:8px 13px;border-radius:999px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);color:#9fe9cf">{{ q.text }}</div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;background:rgba(17,24,39,.7);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:7px 7px 7px 18px">
+              <input value="{{ coachInput }}" onInput="{{ onCoachInput }}" onKeyDown="{{ onCoachKey }}" placeholder="Ask about your money…" style="flex:1;background:none;border:none;outline:none;color:#e8edf6;font-family:'Manrope';font-size:14.5px" />
+              <button onClick="{{ sendCoach }}" style="cursor:pointer;width:40px;height:40px;border-radius:10px;border:none;background:linear-gradient(135deg,#34d399,#2f81f7);color:#05070e;font-size:17px;display:flex;align-items:center;justify-content:center">→</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { screen:'landing', upload:'idle', step:0, prog:0, chat:null, coachInput:'', coachTyping:false, fileName:'', dragOver:false };
+  _file = React.createRef();
+
+  // ---------- sample data (Kenyan SME: Wanjiru, Kamau Hardware) ----------
+  targets = { income:1284500, expenses:947300, net:337200, savingsRate:26, health:78, netWorth:4620000, burn:31577 };
+
+  kes(n){ return 'KES ' + Math.round(n).toLocaleString('en-US'); }
+  kfmt(n){ return n>=1000000 ? 'KES '+(n/1000000).toFixed(2)+'M' : 'KES '+Math.round(n/1000)+'K'; }
+
+  componentDidMount(){ this._raf=null; }
+
+  go(screen){
+    this.setState({ screen });
+    if(screen==='dashboard') this.animate();
+  }
+  animate(){
+    cancelAnimationFrame(this._raf);
+    const dur=1500, t0=performance.now();
+    const ease=x=>1-Math.pow(1-x,3);
+    const tick=now=>{
+      const p=Math.min(1,(now-t0)/dur);
+      this.setState({ prog: ease(p) });
+      if(p<1) this._raf=requestAnimationFrame(tick);
+    };
+    this.setState({prog:0});
+    this._raf=requestAnimationFrame(tick);
+  }
+  openFilePicker(){ if(this._file.current) this._file.current.click(); }
+  onFilePicked(e){
+    const f=e.target.files && e.target.files[0];
+    if(f){ this.runAnalysis(f.name); }
+  }
+  onFileDrop(e){
+    e.preventDefault(); this.setState({dragOver:false});
+    const f=e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f) this.runAnalysis(f.name); else this.openFilePicker();
+  }
+  runAnalysis(fileName){
+    this.setState({ upload:'busy', step:0, fileName: (typeof fileName==='string'? fileName : '') });
+    const total=5;
+    this._iv=setInterval(()=>{
+      this.setState(s=>{
+        const next=s.step+1;
+        if(next>=total){ clearInterval(this._iv); setTimeout(()=>{ this.setState({screen:'dashboard',upload:'idle'}); this.animate(); }, 650); }
+        return { step: next };
+      });
+    }, 700);
+  }
+
+  // ---------- chart builders ----------
+  gauge(value,max,size,stroke,color){
+    const h=React.createElement, r=(size-stroke)/2-4, c=2*Math.PI*r, off=c*(1-Math.min(1,value/max));
+    const gid='gg'+Math.round(value);
+    return h('svg',{width:size,height:size,viewBox:`0 0 ${size} ${size}`},
+      h('defs',null,h('linearGradient',{id:gid,x1:'0',y1:'0',x2:'1',y2:'1'},
+        h('stop',{offset:'0%',stopColor:color}), h('stop',{offset:'100%',stopColor:'#2f81f7'}))),
+      h('circle',{cx:size/2,cy:size/2,r,fill:'none',stroke:'rgba(255,255,255,.07)',strokeWidth:stroke}),
+      h('circle',{cx:size/2,cy:size/2,r,fill:'none',stroke:`url(#${gid})`,strokeWidth:stroke,strokeLinecap:'round',
+        strokeDasharray:c,strokeDashoffset:off,transform:`rotate(-90 ${size/2} ${size/2})`,
+        style:{filter:`drop-shadow(0 0 8px ${color}66)`}}));
+  }
+  smooth(pts){
+    if(pts.length<2) return '';
+    let d=`M ${pts[0].x} ${pts[0].y}`;
+    for(let i=0;i<pts.length-1;i++){
+      const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+      const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+      const c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+      d+=` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2.x} ${p2.y}`;
+    }
+    return d;
+  }
+  river(){
+    const h=React.createElement, W=560,H=240,pad=14, top=20,bot=H-26;
+    const inc=[980,1040,995,1120,1080,1185,1150,1210,1175,1240,1260,1284];
+    const exp=[870,910,890,940,905,980,950,1000,960,1010,1020,947];
+    const max=1320, min=820;
+    const X=i=>pad+i*((W-2*pad)/(inc.length-1));
+    const Y=v=>top+(1-(v-min)/(max-min))*(bot-top);
+    const ip=inc.map((v,i)=>({x:X(i),y:Y(v)})), ep=exp.map((v,i)=>({x:X(i),y:Y(v)}));
+    const incLine=this.smooth(ip), expLine=this.smooth(ep);
+    const area=incLine+` L ${X(11)} ${bot} L ${X(0)} ${bot} Z`;
+    const earea=expLine+` L ${X(11)} ${bot} L ${X(0)} ${bot} Z`;
+    const months=['A','M','J','J','A','S','O','N','D','J','F','M'];
+    return h('svg',{width:'100%',viewBox:`0 0 ${W} ${H}`,style:{display:'block'}},
+      h('defs',null,
+        h('linearGradient',{id:'rIn',x1:'0',y1:'0',x2:'0',y2:'1'},h('stop',{offset:'0%',stopColor:'#34d399',stopOpacity:.35}),h('stop',{offset:'100%',stopColor:'#34d399',stopOpacity:0})),
+        h('linearGradient',{id:'rEx',x1:'0',y1:'0',x2:'0',y2:'1'},h('stop',{offset:'0%',stopColor:'#3b82f6',stopOpacity:.28}),h('stop',{offset:'100%',stopColor:'#3b82f6',stopOpacity:0}))),
+      [0,1,2,3].map(g=>h('line',{key:g,x1:pad,x2:W-pad,y1:top+g*((bot-top)/3),y2:top+g*((bot-top)/3),stroke:'rgba(255,255,255,.05)'})),
+      h('path',{d:area,fill:'url(#rIn)'}),
+      h('path',{d:earea,fill:'url(#rEx)'}),
+      h('path',{d:expLine,fill:'none',stroke:'#3b82f6',strokeWidth:2.2}),
+      h('path',{d:incLine,fill:'none',stroke:'#34d399',strokeWidth:2.6,style:{filter:'drop-shadow(0 0 6px rgba(52,211,153,.5))'}}),
+      ip.map((p,i)=>h('circle',{key:'i'+i,cx:p.x,cy:p.y,r:i===11?4:0,fill:'#34d399'})),
+      months.map((m,i)=>h('text',{key:'m'+i,x:X(i),y:H-7,fill:'#5f6b80',fontSize:10,textAnchor:'middle',fontFamily:'JetBrains Mono'},m)));
+  }
+  ringSeg(cx,cy,r0,r1,a0,a1){
+    const p=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+    const large=(a1-a0)>Math.PI?1:0;
+    const [x0,y0]=p(r1,a0),[x1,y1]=p(r1,a1),[x2,y2]=p(r0,a1),[x3,y3]=p(r0,a0);
+    return `M ${x0.toFixed(1)} ${y0.toFixed(1)} A ${r1} ${r1} 0 ${large} 1 ${x1.toFixed(1)} ${y1.toFixed(1)} L ${x2.toFixed(1)} ${y2.toFixed(1)} A ${r0} ${r0} 0 ${large} 0 ${x3.toFixed(1)} ${y3.toFixed(1)} Z`;
+  }
+  sunburstChart(){
+    const h=React.createElement, S=230, c=S/2;
+    const cats=[
+      {n:'Inventory',v:312,col:'#3b82f6',subs:[['Bidco',121],['Other stock',191]]},
+      {n:'Salaries',v:168,col:'#a371f7',subs:[['Staff',168]]},
+      {n:'Rent',v:95,col:'#f59e0b',subs:[['Shop rent',95]]},
+      {n:'Fuel/Transport',v:78,col:'#22d3ee',subs:[['Fuel',49],['Matatu',29]]},
+      {n:'Loans',v:72,col:'#f87171',subs:[['Equity',72]]},
+      {n:'Food',v:64,col:'#34d399',subs:[['Groceries',40],['Dining',24]]},
+      {n:'Other',v:158,col:'#64748b',subs:[['Bills',41],['Fees',55],['Misc',62]]}
+    ];
+    const tot=cats.reduce((s,x)=>s+x.v,0);
+    let a=-Math.PI/2; const inner=[], outer=[];
+    cats.forEach((ct,k)=>{
+      const span=ct.v/tot*2*Math.PI, a0=a, a1=a+span;
+      inner.push(h('path',{key:'i'+k,d:this.ringSeg(c,c,42,72,a0,a1),fill:ct.col,opacity:.92,stroke:'#05070e',strokeWidth:1.5}));
+      let sa=a0;
+      ct.subs.forEach((sb,j)=>{
+        const ss=sb[1]/ct.v*span;
+        outer.push(h('path',{key:'o'+k+'_'+j,d:this.ringSeg(c,c,74,106,sa,sa+ss),fill:ct.col,opacity:.45,stroke:'#05070e',strokeWidth:1.5}));
+        sa+=ss;
+      });
+      a=a1;
+    });
+    return h('svg',{width:S,height:S,viewBox:`0 0 ${S} ${S}`},inner,outer,
+      h('circle',{cx:c,cy:c,r:40,fill:'#0b1220',stroke:'rgba(255,255,255,.08)'}),
+      h('text',{x:c,y:c-3,fill:'#e8edf6',fontSize:13,fontWeight:700,textAnchor:'middle',fontFamily:'Space Grotesk'},'947K'),
+      h('text',{x:c,y:c+12,fill:'#8a97ad',fontSize:9,textAnchor:'middle',fontFamily:'JetBrains Mono'},'SPENT'));
+  }
+  sankeyChart(){
+    const h=React.createElement, W=820,H=320, lx=40, mx=300, rx=560, ex=760, nw=16;
+    const inc=[{n:'Business Sales',v:985,col:'#34d399'},{n:'Client Transfers',v:210,col:'#22d3ee'},{n:'Other Income',v:90,col:'#a371f7'}];
+    const out=[{n:'Inventory',v:312,col:'#3b82f6'},{n:'Salaries',v:168,col:'#a371f7'},{n:'Operations',v:215,col:'#f59e0b'},{n:'Loans',v:72,col:'#f87171'},{n:'Living',v:180,col:'#22d3ee'},{n:'Saved',v:337,col:'#34d399'}];
+    const totI=inc.reduce((s,x)=>s+x.v,0), totO=out.reduce((s,x)=>s+x.v,0);
+    const scale=(H-60)/Math.max(totI,totO);
+    const nodes=[];
+    // income nodes
+    let y=30; const incPos=inc.map(n=>{const hgt=n.v*scale; const o={...n,y,h:hgt}; y+=hgt+10; return o;});
+    // hub
+    const hubH=totI*scale, hubY=30;
+    // out nodes
+    y=30; const outPos=out.map(n=>{const hgt=n.v*scale; const o={...n,y,h:hgt}; y+=hgt+8; return o;});
+    const links=[];
+    let hubFillL=hubY;
+    incPos.forEach((n,i)=>{
+      const y0=n.y+n.h/2, y1=hubFillL+n.h/2; hubFillL+=n.h;
+      links.push(h('path',{key:'li'+i,d:`M ${lx+nw} ${y0} C ${(lx+mx)/2} ${y0}, ${(lx+mx)/2} ${y1}, ${mx} ${y1}`,fill:'none',stroke:n.col,strokeWidth:Math.max(2,n.h),opacity:.32}));
+    });
+    let hubFillR=hubY;
+    outPos.forEach((n,i)=>{
+      const yy0=hubFillR+n.h/2; hubFillR+=n.h;
+      const y1=n.y+n.h/2;
+      links.push(h('path',{key:'lo'+i,d:`M ${mx+nw} ${yy0} C ${(mx+rx)/2} ${yy0}, ${(mx+rx)/2} ${y1}, ${rx} ${y1}`,fill:'none',stroke:n.col,strokeWidth:Math.max(2,n.h),opacity:.32}));
+    });
+    incPos.forEach((n,i)=>{
+      nodes.push(h('rect',{key:'ni'+i,x:lx,y:n.y,width:nw,height:n.h,rx:3,fill:n.col}));
+      nodes.push(h('text',{key:'ti'+i,x:lx-8,y:n.y+n.h/2+4,fill:'#cdd6e4',fontSize:11.5,textAnchor:'end',fontFamily:'Manrope'},n.n));
+    });
+    nodes.push(h('rect',{key:'hub',x:mx,y:hubY,width:nw,height:hubH,rx:3,fill:'#e8edf6'}));
+    nodes.push(h('text',{key:'hubt',x:mx+nw/2,y:hubY-8,fill:'#8a97ad',fontSize:11,textAnchor:'middle',fontFamily:'JetBrains Mono'},'INCOME 1.28M'));
+    outPos.forEach((n,i)=>{
+      nodes.push(h('rect',{key:'no'+i,x:rx,y:n.y,width:nw,height:n.h,rx:3,fill:n.col}));
+      nodes.push(h('text',{key:'to'+i,x:rx+nw+8,y:n.y+n.h/2+4,fill:'#cdd6e4',fontSize:11.5,fontFamily:'Manrope'},`${n.n}  ${n.v}K`));
+    });
+    return h('svg',{width:W+110,height:H,viewBox:`-100 0 ${W+120} ${H}`,style:{minWidth:W+110}},links,nodes);
+  }
+  heatmapChart(){
+    const h=React.createElement, cell=22, gap=5, cols=7, rows=5;
+    let s=7; const rnd=()=>{s=(s*9301+49297)%233280; return s/233280;};
+    const days=Array.from({length:35},()=>rnd());
+    const max=1;
+    const dl=['M','T','W','T','F','S','S'];
+    const rects=[];
+    days.forEach((v,i)=>{
+      const col=i%7, row=Math.floor(i/7);
+      const spike = i===5||i===19||i===26;
+      const val = spike? .95 : v*.7+.05;
+      rects.push(h('rect',{key:i,x:col*(cell+gap),y:row*(cell+gap)+18,width:cell,height:cell,rx:5,
+        fill:`rgba(52,211,153,${(0.12+val*0.85).toFixed(2)})`,stroke:'rgba(255,255,255,.04)'}));
+    });
+    return h('svg',{width:(cell+gap)*7,height:(cell+gap)*5+18,viewBox:`0 0 ${(cell+gap)*7} ${(cell+gap)*5+18}`},
+      dl.map((d,i)=>h('text',{key:'d'+i,x:i*(cell+gap)+cell/2,y:10,fill:'#5f6b80',fontSize:9.5,textAnchor:'middle',fontFamily:'JetBrains Mono'},d)),
+      rects);
+  }
+  galaxyChart(){
+    const h=React.createElement, W=560,H=260;
+    const cols=['#34d399','#3b82f6','#a371f7','#f59e0b','#22d3ee','#f87171'];
+    let s=99; const rnd=()=>{s=(s*9301+49297)%233280; return s/233280;};
+    const stars=Array.from({length:46},(_,i)=>({
+      x:18+rnd()*(W-36), y:16+rnd()*(H-32), r:2+rnd()*rnd()*13, col:cols[Math.floor(rnd()*cols.length)], d:(rnd()*4).toFixed(2)
+    }));
+    return h('svg',{width:'100%',viewBox:`0 0 ${W} ${H}`,style:{display:'block'}},
+      stars.map((st,i)=>h('g',{key:i},
+        h('circle',{cx:st.x,cy:st.y,r:st.r+3,fill:st.col,opacity:.13}),
+        h('circle',{cx:st.x,cy:st.y,r:st.r,fill:st.col,opacity:.9,style:{animation:`mdTwinkle ${2+ +st.d}s ease-in-out ${st.d}s infinite`,filter:`drop-shadow(0 0 5px ${st.col})`}}))));
+  }
+  dnaRadarChart(){
+    const h=React.createElement, S=260, c=S/2, R=92;
+    const traits=[['Saver',72],['Investor',58],['Discipline',82],['Impulse',34],['Business',88],['Luxury',26],['Planner',70]];
+    const N=traits.length;
+    const pt=(val,i)=>{const a=-Math.PI/2+i*2*Math.PI/N; const r=R*val/100; return [c+r*Math.cos(a),c+r*Math.sin(a)];};
+    const axPt=(i,k=1)=>{const a=-Math.PI/2+i*2*Math.PI/N; return [c+R*k*Math.cos(a),c+R*k*Math.sin(a)];};
+    const poly=traits.map((t,i)=>pt(t[1],i).join(',')).join(' ');
+    const rings=[0.25,0.5,0.75,1].map((k,i)=>h('polygon',{key:'r'+i,points:traits.map((t,j)=>axPt(j,k).join(',')).join(' '),fill:'none',stroke:'rgba(255,255,255,.07)'}));
+    const axes=traits.map((t,i)=>{const[x,y]=axPt(i);return h('line',{key:'a'+i,x1:c,y1:c,x2:x,y2:y,stroke:'rgba(255,255,255,.06)'});});
+    const labels=traits.map((t,i)=>{const[x,y]=axPt(i,1.18);return h('text',{key:'l'+i,x,y:y+3,fill:'#9aa7bd',fontSize:10.5,textAnchor:'middle',fontFamily:'JetBrains Mono'},t[0]);});
+    const dots=traits.map((t,i)=>{const[x,y]=pt(t[1],i);return h('circle',{key:'d'+i,cx:x,cy:y,r:3,fill:'#c4a8ff'});});
+    return h('svg',{width:S,height:S,viewBox:`0 0 ${S} ${S}`},
+      h('defs',null,h('radialGradient',{id:'dnaF'},h('stop',{offset:'0%',stopColor:'#a371f7',stopOpacity:.5}),h('stop',{offset:'100%',stopColor:'#a371f7',stopOpacity:.12}))),
+      rings,axes,
+      h('polygon',{points:poly,fill:'url(#dnaF)',stroke:'#a371f7',strokeWidth:2,style:{filter:'drop-shadow(0 0 8px rgba(163,113,247,.5))'}}),
+      dots,labels);
+  }
+  particlesNode(){
+    const h=React.createElement;
+    let s=5; const rnd=()=>{s=(s*9301+49297)%233280; return s/233280;};
+    const cols=['#34d399','#2f81f7','#a371f7'];
+    const dots=Array.from({length:34},(_,i)=>({l:rnd()*100,t:rnd()*100,sz:2+rnd()*4,d:(rnd()*8).toFixed(1),dur:(7+rnd()*8).toFixed(1),c:cols[Math.floor(rnd()*3)],o:.2+rnd()*.5}));
+    return h('div',{style:{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'}},
+      dots.map((d,i)=>h('div',{key:i,style:{position:'absolute',left:d.l+'%',top:d.t+'%',width:d.sz,height:d.sz,borderRadius:'50%',background:d.c,opacity:d.o,boxShadow:`0 0 ${d.sz*3}px ${d.c}`,animation:`mdFloat ${d.dur}s ease-in-out ${d.d}s infinite`}})));
+  }
+
+  // ---------- coach ----------
+  defaultChat(){
+    return [{from:'ai',html:"Hi Wanjiru 👋 I've read your March statement — 312 transactions across business and personal. Your savings rate hit <b>26%</b>, beating your 20% target. Ask me anything, or tap a suggestion below."}];
+  }
+  coachAnswer(q){
+    const k=q.toLowerCase();
+    if(k.includes('save')&&k.includes('10')) return "To free up <b>KES 10,000/month</b>: (1) two unused subscriptions = KES 2,400, (2) trimming weekend dining 30% = KES 3,800, (3) consolidating fuel runs = KES 1,500, (4) moving idle till-float to M-Shwari earns ~KES 2,300 interest. That's your 10K — and it compounds to <b>KES 120K+ a year</b>. Want me to auto-set this aside on payday?";
+    if(k.includes('where')||k.includes('going')) return "Your biggest outflow is <b>Inventory (KES 312K, 33%)</b> — healthy, it's your business engine. After that: Staff salaries (KES 168K), Rent (KES 95K), Loan repayment (KES 72K). Personal living is only KES 180K — disciplined. The leak to watch is <b>late-night cash withdrawals</b> (KES 60K this month).";
+    if(k.includes('overspend')||k.includes('over spend')) return "You're <b>not overspending overall</b> — you saved 26% of income. But two pockets run hot: late-night spending (38% of personal expenses fall between 7–11PM) and impulse till payments on weekends. Tighten those and your savings rate could reach 32%.";
+    if(k.includes('continue')||k.includes('happen')||k.includes('lifestyle')) return "If you hold this exact pattern for 12 months: you'd save <b>KES 4.04M</b> and your net worth climbs from KES 4.62M to ~<b>KES 8.6M</b>. Redirect just the late-night withdrawals into your Land goal and you'd hit it <b>5 months early</b>.";
+    if(k.includes('cut')||k.includes('which expense')) return "Three I'd cut first: <b>DSTV</b> (KES 9,600 — you stream more than you watch), one duplicate <b>QuickMart</b> charge to dispute (KES 4,500), and 40% of weekend dining. Total reclaimed: <b>KES 18,900/month</b> with almost no lifestyle hit.";
+    if(k.includes('saving culture')||k.includes('habit')||k.includes('build')) return "You're already building a strong saving culture — 4 months above 20%. To lock it in: <b>pay yourself first</b> (auto-move 25% to M-Shwari the morning sales land), keep your emergency fund growing to 3 months of expenses (KES 285K to go), then route surplus into a money-market fund earning ~10%. Small, automatic, relentless.";
+    return "Based on your March data: income <b>KES 1.28M</b>, expenses <b>KES 947K</b>, saved <b>KES 337K (26%)</b>. Your health score is 78/100 — strong and stable. Tell me what you'd like to improve — saving more, cutting costs, or planning a goal — and I'll build you a concrete plan from your own numbers.";
+  }
+  sendCoach(){
+    const q=(this.state.coachInput||'').trim();
+    if(!q) return;
+    const chat=(this.state.chat||this.defaultChat()).concat([{from:'me',html:q}]);
+    this.setState({ chat, coachInput:'', coachTyping:true });
+    clearTimeout(this._ct);
+    this._ct=setTimeout(()=>{
+      this.setState(s=>({ coachTyping:false, chat:(s.chat||[]).concat([{from:'ai',html:this.coachAnswer(q)}]) }));
+    }, 900);
+  }
+  askSuggested(text){
+    const chat=(this.state.chat||this.defaultChat()).concat([{from:'me',html:text}]);
+    this.setState({ chat, coachTyping:true });
+    clearTimeout(this._ct);
+    this._ct=setTimeout(()=>{
+      this.setState(s=>({ coachTyping:false, chat:(s.chat||[]).concat([{from:'ai',html:this.coachAnswer(text)}]) }));
+    }, 900);
+  }
+
+  renderVals(){
+    const sc=this.state.screen, p=this.state.prog, t=this.targets;
+    const navDef=[
+      {key:'dashboard',label:'Dashboard',icon:'◈'},
+      {key:'analytics',label:'Analytics',icon:'◑'},
+      {key:'coach',label:'Wealth Coach',icon:'✦'}
+    ];
+    const navItems=navDef.map(n=>{
+      const on=sc===n.key;
+      return {label:n.label,icon:n.icon,go:()=>this.go(n.key),
+        color:on?'#e8edf6':'#8a97ad',
+        bg:on?'rgba(52,211,153,.1)':'transparent',
+        bd:on?'rgba(52,211,153,.22)':'rgba(255,255,255,0)'};
+    });
+
+    const stepDefs=['Parsing PDF / extracting 312 transactions','AI categorising spend into 21 classes','Detecting patterns & subscriptions','Forecasting 90-day cashflow','Composing your money story'];
+    const stepMeta=['1.2s','0.8s','0.6s','0.9s','0.4s'];
+    const steps=stepDefs.map((label,i)=>{
+      const done=i<this.state.step, active=i===this.state.step;
+      return {label,
+        meta: done?'done':(active?'…':''),
+        mark: done?'✓':(active?'':''+(i+1)),
+        bg: done?'rgba(52,211,153,.15)':(active?'rgba(47,129,247,.15)':'rgba(255,255,255,.04)'),
+        bd: done?'rgba(52,211,153,.4)':(active?'rgba(47,129,247,.4)':'rgba(255,255,255,.08)'),
+        fg: done?'#34d399':(active?'#7fb4ff':'#5f6b80'),
+        tc: (done||active)?'#e8edf6':'#7a8699'};
+    });
+
+    const kpis=[
+      {label:'TOTAL INCOME',value:this.kes(t.income*p),sub:'+8.4% vs Feb',accent:'#34d399',vcolor:'#e8edf6'},
+      {label:'TOTAL EXPENSES',value:this.kes(t.expenses*p),sub:'-2.1% vs Feb',accent:'#3b82f6',vcolor:'#e8edf6'},
+      {label:'NET CASHFLOW',value:'+'+this.kes(t.net*p),sub:'money you kept',accent:'#34d399',vcolor:'#7fe9c4'},
+      {label:'BURN RATE',value:this.kes(t.burn*p)+'/d',accent:'#f59e0b',sub:'daily spend',vcolor:'#e8edf6'}
+    ];
+
+    const cat=[
+      ['Inventory / Stock',312,'#3b82f6'],['Staff Salaries',168,'#a371f7'],['Rent',95,'#f59e0b'],
+      ['Fuel & Transport',78,'#22d3ee'],['Loan Repayment',72,'#f87171'],['Food & Dining',64,'#34d399']
+    ];
+    const cmax=312;
+    const categories=cat.map(c=>({name:c[0],amt:this.kes(c[1]*1000),w:(c[1]/cmax*100*p).toFixed(1)+'%',color:c[2]}));
+
+    const mpe=[['Buy Goods (Till)',38,'#34d399'],['Paybill',22,'#3b82f6'],['Send Money',16,'#a371f7'],['Withdrawals',9,'#f59e0b'],['M-Shwari (save)',6,'#22d3ee'],['Fuliza',4,'#f87171'],['Airtime/Bundles',3,'#94a3b8'],['Bank Transfer',2,'#64748b']];
+    const mpesa=mpe.map(m=>({label:m[0],pct:m[1]+'%',color:m[2]}));
+
+    const mer=[
+      ['1','Bidco Suppliers','Inventory · Buy Goods',121000,'48 txns','#3b82f6'],
+      ['2','Naivas Supermarket','Groceries · Till',84200,'31 txns','#34d399'],
+      ['3','Equity Bank','Loan repayment',72000,'1 txn','#f87171'],
+      ['4','Shell Westlands','Fuel · Till',36400,'22 txns','#22d3ee'],
+      ['5','KPLC (Kenya Power)','Utilities · Paybill',38900,'2 txns','#f59e0b'],
+      ['6','Safaricom','Airtime & data',22150,'18 txns','#a371f7']
+    ];
+    const merchants=mer.map(m=>({rank:m[0],name:m[1],tag:m[2],amt:this.kes(m[3]),count:m[4],color:m[5]}));
+
+    const anomalies=[
+      {title:'Duplicate charge detected',body:'KES 4,500 to QuickMart billed twice within 3 minutes. Likely a double-tap — worth disputing.',dot:'#f87171',bg:'rgba(248,113,113,.07)',bd:'rgba(248,113,113,.2)'},
+      {title:'Large late-night withdrawal',body:'KES 60,000 cash at 11:42 PM, 14 March — well above your usual pattern.',dot:'#f59e0b',bg:'rgba(245,158,11,.07)',bd:'rgba(245,158,11,.2)'},
+      {title:'Fuliza used 6 times',body:'Overdraft fees cost KES 940 this month. A small M-Shwari buffer would remove this.',dot:'#fbbf24',bg:'rgba(251,191,36,.06)',bd:'rgba(251,191,36,.18)'}
+    ];
+
+    const gl=[
+      ['🛡️','Emergency Fund',180,300,'#34d399'],['🏪','Business Capital',420,1000,'#3b82f6'],
+      ['🌍','Plot of Land',1250,2500,'#a371f7'],['🎓','School Fees',90,120,'#f59e0b']
+    ];
+    const shortK=v=> v>=1000 ? (v/1000).toFixed(2)+'M' : v+'K';
+    const goals=gl.map(g=>({icon:g[0],name:g[1],w:(g[2]/g[3]*100).toFixed(0)+'%',have:shortK(g[2]),target:'of '+shortK(g[3]),color:g[4]}));
+
+    const hp=[['Savings behaviour',88,'#34d399'],['Income consistency',82,'#34d399'],['Debt ratio',70,'#3b82f6'],['Spending volatility',64,'#f59e0b']];
+    const healthParts=hp.map(h=>({label:h[0],w:h[1]+'%',color:h[2]}));
+
+    const insights=[
+      {text:'Your savings rate hit 26% — above the 20% healthy benchmark. Strongest month since November.',color:'#34d399'},
+      {text:'Recurring subscriptions cost KES 18,250/month. Cancelling 2 unused saves KES 219,000 a year.',color:'#f59e0b'},
+      {text:'Late-night spending (7–11PM) is 38% of personal expenses — your main impulse window.',color:'#a371f7'},
+      {text:'Moving idle till-float into a money-market fund could earn ~KES 28,000 this year, risk-free.',color:'#3b82f6'}
+    ];
+
+    const sunLegend=[
+      ['Inventory','33%','#3b82f6'],['Salaries','18%','#a371f7'],['Rent','10%','#f59e0b'],
+      ['Fuel/Transport','8%','#22d3ee'],['Loans','8%','#f87171'],['Food + Other','23%','#34d399']
+    ].map(l=>({name:l[0],pct:l[1],color:l[2]}));
+
+    // chat rendering
+    const chatRaw=this.state.chat||this.defaultChat();
+    const chat=chatRaw.map(m=>{
+      const me=m.from==='me';
+      return {html:m.html, dir:'row', align:me?'flex-end':'flex-start',
+        avatar:me?'WK':'✦',
+        avBg:me?'rgba(163,113,247,.15)':'rgba(52,211,153,.12)',
+        avBd:me?'rgba(163,113,247,.3)':'rgba(52,211,153,.25)',
+        avFg:me?'#c4a8ff':'#34d399',
+        bubBg:me?'rgba(163,113,247,.12)':'rgba(17,24,39,.7)',
+        bubBd:me?'rgba(163,113,247,.22)':'rgba(255,255,255,.08)',
+        bubFg:me?'#e8edf6':'#cdd6e4'};
+    });
+    // render html with bold support via dangerouslySet -> use React element
+    const chatNodes=chat.map(c=>({...c, html: React.createElement('span',{dangerouslySetInnerHTML:{__html:c.html}})}));
+    const suggDefs=['How can I save KES 10,000 monthly?','Where is my money going?','Am I overspending?','How do I build a saving culture?'];
+    const suggestions=suggDefs.map(s=>({text:s, ask:()=>this.askSuggested(s)}));
+
+    const features=[
+      {icon:'🧬',title:'Spending DNA',body:'A behavioural fingerprint of how you really spend — and what it reveals about your money habits.'},
+      {icon:'📊',title:'Live dashboards',body:'Animated health score, savings rate, cashflow river and burn rate — your money at a glance.'},
+      {icon:'🔮',title:'Cashflow forecast',body:'Predict your balance 7, 30 and 90 days out with confidence bands and shortfall alerts.'},
+      {icon:'✦',title:'AI Wealth Coach',body:'Ask anything. Get concrete, numbers-backed answers built from your own transaction history.'},
+      {icon:'🇰🇪',title:'Built for M-PESA',body:'Understands Paybill, Till, Fuliza, M-Shwari and Send Money — not just generic bank rows.'},
+      {icon:'🛡️',title:'Saving culture',body:'Streaks, goals and nudges that make putting money aside a habit you actually keep.'}
+    ];
+
+    return {
+      isLanding: sc==='landing', isUpload: sc==='upload',
+      isApp: sc==='dashboard'||sc==='analytics'||sc==='coach',
+      isDash: sc==='dashboard', isAnalytics: sc==='analytics', isCoach: sc==='coach',
+      uploadIdle: this.state.upload==='idle', uploadBusy: this.state.upload==='busy',
+      analyzePct: Math.min(100,Math.round((this.state.step/5)*100))+'%',
+      analyzeCaption: (this.state.fileName? '📄 '+this.state.fileName+' · ' : '') + stepDefs[Math.min(this.state.step,4)],
+      goLanding:()=>this.go('landing'), goUpload:()=>this.go('upload'),
+      goDemo:()=>{ this.go('dashboard'); }, goCoach:()=>this.go('coach'),
+      runAnalysis:()=>this.runAnalysis(),
+      fileRef:this._file,
+      openFilePicker:()=>this.openFilePicker(),
+      onFilePicked:(e)=>this.onFilePicked(e),
+      onFileDrop:(e)=>this.onFileDrop(e),
+      onDragOver:(e)=>{ e.preventDefault(); if(!this.state.dragOver) this.setState({dragOver:true}); },
+      onDragLeave:(e)=>{ e.preventDefault(); this.setState({dragOver:false}); },
+      dropBorder: this.state.dragOver?'rgba(52,211,153,.8)':'rgba(52,211,153,.35)',
+      dropBg: this.state.dragOver?'rgba(52,211,153,.08)':'linear-gradient(180deg,rgba(17,24,39,.5),rgba(10,16,28,.35))',
+      dropTitle: this.state.dragOver?'Release to upload':'Drop your file here',
+      dropHint: this.state.dragOver?'PDF, CSV or Excel':'or click to browse',
+      particles: this.particlesNode(),
+      features, navItems, steps, kpis, categories, mpesa, merchants, anomalies, goals, healthParts, insights, sunLegend,
+      counters:{ health:Math.round(t.health*p), savingsRate:Math.round(t.savingsRate*p)+'%' },
+      healthGauge: this.gauge(t.health*p,100,190,15,'#34d399'),
+      savingsRing: this.gauge(t.savingsRate*p,100,150,13,'#34d399'),
+      riverChart: this.river(),
+      sunburst: this.sunburstChart(), sankey: this.sankeyChart(),
+      heatmap: this.heatmapChart(), galaxy: this.galaxyChart(), dnaRadar: this.dnaRadarChart(),
+      chat: chatNodes, suggestions, coachTyping: this.state.coachTyping, coachInput: this.state.coachInput,
+      onCoachInput:(e)=>this.setState({coachInput:e.target.value}),
+      onCoachKey:(e)=>{ if(e.key==='Enter') this.sendCoach(); },
+      sendCoach:()=>this.sendCoach()
+    };
+  }
+}
+</script>
+</body>
+</html>
