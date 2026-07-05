@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  businessName String?
+  demo         Boolean  @default(false)
+  streakMonths Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  statements   Statement[]
+  transactions Transaction[]
+  goals        Goal[]
+  chatMessages ChatMessage[]
+}
+
+model Statement {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileName    String
+  sourceType  String
+  status      String   @default("done")
+  txnCount    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statementId   String?
+  statement     Statement? @relation(fields: [statementId], references: [id], onDelete: SetNull)
+  date          DateTime
+  description   String
+  counterparty  String?
+  amount        Float
+  direction     String
+  category      String
+  channel       String?
+  rawRef        String?
+  balanceAfter  Float?
+  isAnomaly     Boolean   @default(false)
+  anomalyReason String?
+  anomalySeverity String?
+  createdAt     DateTime  @default(now())
+
+  @@index([userId, date])
+  @@index([userId, category])
+}
+
+model Goal {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  icon          String
+  color         String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
