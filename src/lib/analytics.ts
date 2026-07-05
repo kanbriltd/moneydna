@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { CATEGORY_COLORS, CHANNEL_COLORS } from "@/lib/categories";
 import { hasReliableTime } from "@/lib/dateUtils";
+import { detectLeaks, type Leak } from "@/lib/leaks";
 import type { Transaction } from "@prisma/client";
 
 const MONTH_LABELS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
@@ -46,6 +47,9 @@ export interface AnalyticsResult {
   savingsRate: number;
   netWorth: number;
   health: { score: number; parts: { label: string; value: number; color: string }[] };
+  stress: { score: number; level: "Low" | "Moderate" | "High" | "Critical"; parts: { label: string; value: number; color: string }[]; explanation: string };
+  leaks: Leak[];
+  lastKnownBalance: number | null;
   cashflowRiver: { labels: string[]; income: number[]; expenses: number[] };
   categories: { name: string; amount: number; widthPct: number; color: string }[];
   mpesaBreakdown: { label: string; pct: number; color: string }[];
@@ -74,6 +78,9 @@ const EMPTY: AnalyticsResult = {
   savingsRate: 0,
   netWorth: 0,
   health: { score: 0, parts: [] },
+  stress: { score: 0, level: "Low", parts: [], explanation: "" },
+  leaks: [],
+  lastKnownBalance: null,
   cashflowRiver: { labels: [], income: [], expenses: [] },
   categories: [],
   mpesaBreakdown: [],
@@ -171,6 +178,37 @@ export async function getAnalytics(userId: string): Promise<AnalyticsResult> {
   ];
   const weights = [0.22, 0.16, 0.14, 0.14, 0.14, 0.1, 0.1];
   const score = Math.round(healthParts.reduce((s, p, i) => s + p.value * weights[i], 0));
+
+  // ---------- financial stress index (inverse framing of the same signals) ----------
+  const stressParts = [
+    { label: "Debt pressure", value: clamp(debtRatio * 300), color: "#f87171" },
+    { label: "Income instability", value: clamp(incomeCV * 140), color: "#f59e0b" },
+    { label: "Cashflow instability", value: clamp(netCV * 80), color: "#f59e0b" },
+    { label: "Low savings buffer", value: clamp(100 - (savingsRate / 30) * 100), color: "#fb923c" },
+    { label: "Weak emergency fund", value: clamp(100 - emergencyCoverage), color: "#f87171" },
+    { label: "Fixed obligation load", value: clamp(Math.max(0, recurringRatio - 0.12) * 250), color: "#a371f7" },
+  ];
+  const stressWeights = [0.22, 0.16, 0.16, 0.18, 0.16, 0.12];
+  const stressScore = Math.round(stressParts.reduce((s, p, i) => s + p.value * stressWeights[i], 0));
+  const stressLevel: "Low" | "Moderate" | "High" | "Critical" =
+    stressScore >= 75 ? "Critical" : stressScore >= 55 ? "High" : stressScore >= 30 ? "Moderate" : "Low";
+  const topStressFactor = [...stressParts].sort((a, b) => b.value - a.value)[0];
+  const stressExplanation =
+    stressScore < 30
+      ? "Your finances are in a stable place this month — no single pressure point stands out."
+      : `Your biggest pressure point is ${topStressFactor.label.toLowerCase()} — easing that would do the most to lower your stress score.`;
+
+  // ---------- money leak detector ----------
+  const leaks = detectLeaks(curTxns, txns, expenses);
+
+  // ---------- last known balance (from most recent transaction with a recorded balance) ----------
+  let lastKnownBalance: number | null = null;
+  for (let i = txns.length - 1; i >= 0; i--) {
+    if (txns[i].balanceAfter != null) {
+      lastKnownBalance = txns[i].balanceAfter;
+      break;
+    }
+  }
 
   // ---------- categories ----------
   const catMap = new Map<string, number>();
@@ -319,6 +357,9 @@ export async function getAnalytics(userId: string): Promise<AnalyticsResult> {
     savingsRate,
     netWorth: baseline,
     health: { score, parts: healthParts.slice(0, 4) },
+    stress: { score: stressScore, level: stressLevel, parts: stressParts, explanation: stressExplanation },
+    leaks,
+    lastKnownBalance,
     cashflowRiver: {
       labels: riverMonths.map((r) => MONTH_LABELS[r.m]),
       income: riverMonths.map((r) => r.income),

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { AnalyticsResult } from "@/lib/analytics";
+import type { DailyBriefing } from "@/lib/coachEngine";
 import { kes } from "@/lib/format";
 import { useAnimatedProgress } from "@/lib/useAnimatedProgress";
 import Gauge from "@/components/charts/Gauge";
@@ -16,7 +17,7 @@ const card: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,.07)",
 };
 
-export default function DashboardView({ data }: { data: AnalyticsResult }) {
+export default function DashboardView({ data, briefing }: { data: AnalyticsResult; briefing?: DailyBriefing }) {
   const p = useAnimatedProgress(1400);
   const [showNewGoal, setShowNewGoal] = useState(false);
   const firstName = data.userName.split(" ")[0] || data.userName;
@@ -90,6 +91,57 @@ export default function DashboardView({ data }: { data: AnalyticsResult }) {
         </div>
       </div>
 
+      {/* AI daily briefing */}
+      {briefing && (
+        <div
+          style={{
+            ...card,
+            marginBottom: 14,
+            background: "linear-gradient(160deg,rgba(163,113,247,.09),rgba(10,16,28,.5))",
+            border: "1px solid rgba(163,113,247,.18)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10, marginBottom: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+              <span style={{ fontSize: 17 }}>☀️</span>
+              <div className="font-space" style={{ fontWeight: 600, fontSize: 16 }}>
+                Today&apos;s briefing
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 18, fontSize: 12.5, color: "#9aa7bd" }}>
+              <span>
+                Cash available: <b style={{ color: "#e8edf6" }}>{kes(briefing.cashAvailable)}</b>
+              </span>
+              {briefing.runwayDays !== null && (
+                <span>
+                  Runway: <b style={{ color: briefing.runwayDays <= 14 ? "#f87171" : "#e8edf6" }}>{briefing.runwayDays}d</b>
+                </span>
+              )}
+            </div>
+          </div>
+          <div style={{ fontSize: 13.5, color: "#cdd6e4", marginBottom: briefing.alerts.length ? 10 : 0 }}>{briefing.headline}</div>
+          {briefing.alerts.length > 0 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 10 }}>
+              {briefing.alerts.map((a, i) => (
+                <div key={i} style={{ fontSize: 12.5, color: "#9aa7bd", lineHeight: 1.45 }} dangerouslySetInnerHTML={{ __html: `• ${a}` }} />
+              ))}
+            </div>
+          )}
+          <div
+            style={{
+              fontSize: 13,
+              color: "#c4a8ff",
+              lineHeight: 1.5,
+              background: "rgba(255,255,255,.03)",
+              border: "1px solid rgba(255,255,255,.06)",
+              padding: "11px 14px",
+              borderRadius: 11,
+            }}
+            dangerouslySetInnerHTML={{ __html: briefing.advice }}
+          />
+        </div>
+      )}
+
       {/* KPI row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 14 }}>
         {kpis.map((k) => (
@@ -153,6 +205,37 @@ export default function DashboardView({ data }: { data: AnalyticsResult }) {
                 <span style={{ color: "#8a97ad", width: 120 }}>{h.label}</span>
                 <div style={{ flex: 1, height: 5, borderRadius: 3, background: "rgba(255,255,255,.07)", overflow: "hidden" }}>
                   <div style={{ height: "100%", borderRadius: 3, width: `${h.value * p}%`, background: h.color, transition: "width .3s" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* financial stress index */}
+      <div style={{ ...card, marginBottom: 14, display: "flex", gap: 22, alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Gauge value={data.stress.score * p} max={100} size={130} stroke={12} color={stressColor(data.stress.level)} />
+          <div style={{ position: "absolute", textAlign: "center" }}>
+            <div className="font-space" style={{ fontWeight: 700, fontSize: 30, lineHeight: 1 }}>
+              {Math.round(data.stress.score * p)}
+            </div>
+            <div className="font-mono-jb" style={{ fontSize: 10.5, color: stressColor(data.stress.level), letterSpacing: ".4px", marginTop: 2 }}>
+              {data.stress.level.toUpperCase()}
+            </div>
+          </div>
+        </div>
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <div className="font-space" style={{ fontWeight: 600, fontSize: 16, marginBottom: 2 }}>
+            Financial stress index
+          </div>
+          <div style={{ fontSize: 12.5, color: "#8a97ad", marginBottom: 10 }}>{data.stress.explanation}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {data.stress.parts.map((s) => (
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12 }}>
+                <span style={{ color: "#8a97ad", width: 150, flexShrink: 0 }}>{s.label}</span>
+                <div style={{ flex: 1, height: 5, borderRadius: 3, background: "rgba(255,255,255,.07)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", borderRadius: 3, width: `${s.value * p}%`, background: s.color, transition: "width .3s" }} />
                 </div>
               </div>
             ))}
@@ -366,6 +449,9 @@ function deltaLabel(pct: number | null, suffix: string) {
   if (pct === null) return suffix;
   const sign = pct >= 0 ? "+" : "";
   return `${sign}${pct.toFixed(1)}% ${suffix}`;
+}
+function stressColor(level: "Low" | "Moderate" | "High" | "Critical") {
+  return level === "Critical" ? "#f87171" : level === "High" ? "#f59e0b" : level === "Moderate" ? "#fbbf24" : "#34d399";
 }
 function healthLabel(score: number) {
   if (score >= 75) return "STRONG";

@@ -17,6 +17,10 @@ const card: React.CSSProperties = {
 function kfmt(n: number) {
   return n >= 1_000_000 ? (n / 1_000_000).toFixed(2) + "M" : Math.round(n / 1000) + "K";
 }
+function kes(n: number) {
+  return "KES " + Math.round(n).toLocaleString("en-US");
+}
+const SEVERITY_COLOR = { high: "#f87171", medium: "#f59e0b", low: "#fbbf24" } as const;
 
 export default function AnalyticsView({ data }: { data: AnalyticsResult }) {
   const totalSpent = data.categories.reduce((s, c) => s + c.amount, 0);
@@ -37,6 +41,47 @@ export default function AnalyticsView({ data }: { data: AnalyticsResult }) {
         </h1>
         <p style={{ color: "#8a97ad", fontSize: 14.5, marginTop: 5 }}>The shape of your money — every shilling, mapped.</p>
       </div>
+
+      {/* money leak detector */}
+      {data.leaks.length > 0 && (
+        <div style={{ ...card, marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 2 }}>
+            <div className="font-space" style={{ fontWeight: 600, fontSize: 16 }}>
+              Money leak detector
+            </div>
+            <div className="font-mono-jb" style={{ fontSize: 12, color: "#f59e0b" }}>
+              ~{kes(data.leaks.reduce((s, l) => s + l.annualEstimate, 0))}/yr at stake
+            </div>
+          </div>
+          <div style={{ fontSize: 12.5, color: "#8a97ad", marginBottom: 14 }}>Ranked by estimated annual cost if the pattern continues</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {data.leaks.map((l) => (
+              <div
+                key={l.id}
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  padding: "13px 14px",
+                  borderRadius: 12,
+                  background: "rgba(255,255,255,.03)",
+                  border: `1px solid ${SEVERITY_COLOR[l.severity]}33`,
+                }}
+              >
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{l.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 3 }}>
+                    <span style={{ fontSize: 13.5, fontWeight: 600 }}>{l.title}</span>
+                    <span className="font-mono-jb" style={{ fontSize: 12.5, color: SEVERITY_COLOR[l.severity], flexShrink: 0 }}>
+                      ~{kes(l.annualEstimate)}/yr
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12.5, color: "#9aa7bd", lineHeight: 1.45 }}>{l.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* DNA + sunburst */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>

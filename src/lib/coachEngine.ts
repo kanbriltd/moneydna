@@ -67,6 +67,78 @@ async function answerWithClaude(
   return mdBoldToHtml(text || "I couldn't come up with an answer just now — try rephrasing?");
 }
 
+export interface DailyBriefing {
+  cashAvailable: number;
+  runwayDays: number | null;
+  riskLevel: "Low" | "Moderate" | "High" | "Critical";
+  headline: string;
+  alerts: string[];
+  advice: string;
+}
+
+/** Deterministic facts (cash, runway, alerts) computed directly from analytics — no LLM involved, so they can't be fabricated. */
+export async function getDailyBriefing(analytics: AnalyticsResult): Promise<DailyBriefing> {
+  const cashAvailable = analytics.lastKnownBalance ?? Math.max(0, analytics.netWorth);
+  const runwayDays = analytics.kpis.burnRate > 0 ? Math.round(cashAvailable / analytics.kpis.burnRate) : null;
+  const riskLevel = analytics.stress.level;
+
+  const alerts: string[] = [];
+  if (runwayDays !== null && runwayDays <= 14) {
+    alerts.push(`At this burn rate, your available cash covers about <b>${runwayDays} more days</b>.`);
+  }
+  if (analytics.anomalies[0]) {
+    alerts.push(`<b>${analytics.anomalies[0].title}</b>: ${analytics.anomalies[0].body}`);
+  }
+  if (analytics.leaks[0]) {
+    alerts.push(`Your biggest leak: <b>${analytics.leaks[0].title}</b> — an estimated ${kes(analytics.leaks[0].annualEstimate)}/year.`);
+  }
+
+  const headline =
+    riskLevel === "Critical" || riskLevel === "High"
+      ? `Today needs some attention — your financial stress is running ${riskLevel.toLowerCase()}.`
+      : `Good morning — your finances look ${riskLevel.toLowerCase()}-stress today.`;
+
+  const advice = await getDailyAdvice(analytics);
+
+  return { cashAvailable, runwayDays, riskLevel, headline, alerts: alerts.slice(0, 3), advice };
+}
+
+async function getDailyAdvice(a: AnalyticsResult): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (apiKey) {
+    try {
+      return await adviceWithClaude(a, apiKey);
+    } catch (err) {
+      console.error("[coachEngine] Daily briefing Claude call failed, falling back to rule-based advice:", err);
+    }
+  }
+  return ruleBasedAdvice(a);
+}
+
+async function adviceWithClaude(a: AnalyticsResult, apiKey: string): Promise<string> {
+  const client = new Anthropic({ apiKey });
+  const system = `You are the Wealth Coach inside MoneyDNA AI. Give ONE short, specific, actionable piece of advice for today based ONLY on the financial summary below — max 25 words, no greeting or preamble. Use **double asterisks** around the single most important number or action. Do not invent numbers not implied by the summary.\n\nFINANCIAL SUMMARY:\n${summarize(a)}`;
+
+  const msg = await client.messages.create({
+    model: "claude-sonnet-5",
+    max_tokens: 120,
+    system,
+    messages: [{ role: "user", content: "What should I focus on today?" }],
+  });
+  const text = msg.content.filter((b) => b.type === "text").map((b) => (b as { text: string }).text).join("\n").trim();
+  return mdBoldToHtml(text || ruleBasedAdvice(a));
+}
+
+function ruleBasedAdvice(a: AnalyticsResult): string {
+  if (a.leaks[0]) {
+    return `Focus today: plug your biggest leak — <b>${a.leaks[0].title}</b>, an estimated ${kes(a.leaks[0].annualEstimate)}/year.`;
+  }
+  if (a.savingsRate < 20) {
+    return `Focus today: your savings rate is <b>${a.savingsRate.toFixed(0)}%</b>, below the 20% target — even a small automatic transfer helps.`;
+  }
+  return `Focus today: you're on track — keep your <b>${a.streakMonths}-month</b> saving streak alive.`;
+}
+
 function ruleBasedAnswer(question: string, a: AnalyticsResult): string {
   const k = question.toLowerCase().trim();
   const b = (s: string) => `<b>${s}</b>`;

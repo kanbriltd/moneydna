@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { getAnalytics } from "@/lib/analytics";
+import { getDailyBriefing } from "@/lib/coachEngine";
 import DashboardView from "@/components/dashboard/DashboardView";
 import EmptyState from "@/components/layout/EmptyState";
 
@@ -16,5 +17,7 @@ export default async function DashboardPage() {
     );
   }
 
-  return <DashboardView data={data} />;
+  const briefing = await getDailyBriefing(data);
+
+  return <DashboardView data={data} briefing={briefing} />;
 }
