@@ -86,7 +86,7 @@ export default function DashboardView({ data, briefing }: { data: AnalyticsResul
               textDecoration: "none",
             }}
           >
-            ✦ Ask Wealth Coach
+            ✦ Talk to your Financial Companion
           </Link>
         </div>
       </div>
@@ -363,7 +363,7 @@ export default function DashboardView({ data, briefing }: { data: AnalyticsResul
         <div style={card}>
           <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 16 }}>
             <div className="font-space" style={{ fontWeight: 600, fontSize: 16 }}>
-              Anomalies &amp; alerts
+              Patterns worth noticing
             </div>
             {data.anomalies.length > 0 && (
               <span className="font-mono-jb" style={{ fontSize: 11, color: "#f59e0b", background: "rgba(245,158,11,.12)", padding: "3px 8px", borderRadius: 6 }}>
@@ -372,7 +372,7 @@ export default function DashboardView({ data, briefing }: { data: AnalyticsResul
             )}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
-            {data.anomalies.length === 0 && <div style={{ fontSize: 13, color: "#7a8699" }}>Nothing unusual this month.</div>}
+            {data.anomalies.length === 0 && <div style={{ fontSize: 13, color: "#7a8699" }}>Nothing stood out this month.</div>}
             {data.anomalies.map((a, i) => {
               const dot = a.severity === "high" ? "#f87171" : a.severity === "medium" ? "#f59e0b" : "#fbbf24";
               const bg = a.severity === "high" ? "rgba(248,113,113,.07)" : a.severity === "medium" ? "rgba(245,158,11,.07)" : "rgba(251,191,36,.06)";

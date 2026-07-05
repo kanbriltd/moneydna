@@ -182,10 +182,10 @@ export async function getAnalytics(userId: string): Promise<AnalyticsResult> {
   // ---------- financial stress index (inverse framing of the same signals) ----------
   const stressParts = [
     { label: "Debt pressure", value: clamp(debtRatio * 300), color: "#f87171" },
-    { label: "Income instability", value: clamp(incomeCV * 140), color: "#f59e0b" },
-    { label: "Cashflow instability", value: clamp(netCV * 80), color: "#f59e0b" },
-    { label: "Low savings buffer", value: clamp(100 - (savingsRate / 30) * 100), color: "#fb923c" },
-    { label: "Weak emergency fund", value: clamp(100 - emergencyCoverage), color: "#f87171" },
+    { label: "Income variability", value: clamp(incomeCV * 140), color: "#f59e0b" },
+    { label: "Cashflow variability", value: clamp(netCV * 80), color: "#f59e0b" },
+    { label: "Savings buffer", value: clamp(100 - (savingsRate / 30) * 100), color: "#fb923c" },
+    { label: "Emergency fund gap", value: clamp(100 - emergencyCoverage), color: "#f87171" },
     { label: "Fixed obligation load", value: clamp(Math.max(0, recurringRatio - 0.12) * 250), color: "#a371f7" },
   ];
   const stressWeights = [0.22, 0.16, 0.16, 0.18, 0.16, 0.12];
@@ -195,8 +195,8 @@ export async function getAnalytics(userId: string): Promise<AnalyticsResult> {
   const topStressFactor = [...stressParts].sort((a, b) => b.value - a.value)[0];
   const stressExplanation =
     stressScore < 30
-      ? "Your finances are in a stable place this month — no single pressure point stands out."
-      : `Your biggest pressure point is ${topStressFactor.label.toLowerCase()} — easing that would do the most to lower your stress score.`;
+      ? "Things look steady this month — no single pressure point stands out."
+      : `The area with the most room to ease things: ${topStressFactor.label.toLowerCase()} — one possibility worth exploring first.`;
 
   // ---------- money leak detector ----------
   const leaks = detectLeaks(curTxns, txns, expenses);
@@ -398,15 +398,15 @@ function buildInsights(args: {
     out.push({
       text:
         savingsRate >= 20
-          ? `Your savings rate hit ${savingsRate.toFixed(0)}% — above the 20% healthy benchmark.`
-          : `Your savings rate is ${savingsRate.toFixed(0)}% — below the 20% healthy benchmark. Small cuts to your top categories would close the gap.`,
+          ? `Your savings rate hit ${savingsRate.toFixed(0)}% — above the 20% benchmark. Worth celebrating.`
+          : `Your savings rate is ${savingsRate.toFixed(0)}%, below the 20% benchmark — one possibility is a small adjustment to your top categories, if that fits right now.`,
       color: savingsRate >= 20 ? "#34d399" : "#f59e0b",
     });
   }
 
   if (recurringSpend > 0) {
     out.push({
-      text: `Recurring subscriptions & bills cost ${kesShort(recurringSpend)}/month. Cancelling two unused ones could save ${kesShort(recurringSpend * 0.25 * 12)} a year.`,
+      text: `Recurring subscriptions & bills come to ${kesShort(recurringSpend)}/month. If a couple aren't earning their place, that could free up roughly ${kesShort(recurringSpend * 0.25 * 12)} a year.`,
       color: "#f59e0b",
     });
   }
@@ -415,7 +415,7 @@ function buildInsights(args: {
   const nightTotal = nightOut.reduce((s, t) => s + t.amount, 0);
   if (expenses > 0 && nightTotal > 0) {
     out.push({
-      text: `Evening spending (7PM–1AM) is ${Math.round((nightTotal / expenses) * 100)}% of this month's expenses — your main impulse window.`,
+      text: `Evening spending (7PM–1AM) is ${Math.round((nightTotal / expenses) * 100)}% of this month's expenses — worth knowing if that's your main spending window.`,
       color: "#a371f7",
     });
   }
@@ -429,7 +429,7 @@ function buildInsights(args: {
   const [topName, topAmt] = Object.entries(topCat).sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
   if (topName) {
     out.push({
-      text: `${topName} is your biggest outflow at ${kesShort(topAmt)} this month — keep an eye on it as the business grows.`,
+      text: `${topName} is your biggest outflow at ${kesShort(topAmt)} this month — good to keep visible as things grow.`,
       color: "#3b82f6",
     });
   }

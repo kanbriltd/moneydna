@@ -22,7 +22,7 @@ export default function Logo({ size = 34 }: { size?: number }) {
         M
       </div>
       <span className="font-space" style={{ fontWeight: 600, fontSize: size < 33 ? 16 : 18, letterSpacing: ".3px" }}>
-        MoneyDNA<span style={{ color: "#34d399" }}> AI</span>
+        Money<span style={{ color: "#34d399" }}>DNA</span>
       </span>
     </Link>
   );

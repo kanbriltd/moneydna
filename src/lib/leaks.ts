@@ -33,13 +33,13 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
   const leaks: Leak[] = [];
   const out = curTxns.filter((t) => t.direction === "out");
 
-  // 1) Subscription waste
+  // 1) Subscriptions
   const subSpend = out.filter((t) => t.category === "Subscriptions").reduce((s, t) => s + t.amount, 0);
   if (subSpend > 0) {
     leaks.push({
       id: "subscriptions",
-      title: "Subscription waste",
-      description: `You're spending ${kes(subSpend)}/month across subscriptions. Cancelling unused ones is the fastest leak to plug.`,
+      title: "Subscription patterns",
+      description: `You're spending ${kes(subSpend)}/month across subscriptions. If a couple aren't earning their place, redirecting that could be an easy possibility.`,
       monthlyEstimate: subSpend,
       annualEstimate: subSpend * 12,
       severity: severityFor(subSpend * 12, expenses),
@@ -47,13 +47,13 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
     });
   }
 
-  // 2) Fuliza dependence
+  // 2) Fuliza usage
   const fulizaSpend = out.filter((t) => t.channel === "Fuliza").reduce((s, t) => s + t.amount, 0);
   if (fulizaSpend > 0) {
     leaks.push({
       id: "fuliza",
-      title: "Fuliza dependence",
-      description: `${kes(fulizaSpend)} in Fuliza overdraft this month — the fees compound fast if this becomes a habit.`,
+      title: "Fuliza usage",
+      description: `${kes(fulizaSpend)} went through Fuliza overdraft this month — worth knowing that those fees can add up if it becomes a regular pattern.`,
       monthlyEstimate: fulizaSpend,
       annualEstimate: fulizaSpend * 12,
       severity: "high",
@@ -61,13 +61,13 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
     });
   }
 
-  // 3) High transaction fees / charges
+  // 3) Transaction fees / charges
   const feeSpend = out.filter((t) => /\b(charge|fee)s?\b/i.test(t.description)).reduce((s, t) => s + t.amount, 0);
   if (feeSpend > 0) {
     leaks.push({
       id: "fees",
       title: "Transaction fees",
-      description: `${kes(feeSpend)} lost to transaction charges this month — batching transfers can cut this down.`,
+      description: `${kes(feeSpend)} went to transaction charges this month — batching transfers is one possibility for keeping more of it.`,
       monthlyEstimate: feeSpend,
       annualEstimate: feeSpend * 12,
       severity: severityFor(feeSpend * 12, expenses),
@@ -81,8 +81,8 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
     const tinySum = tiny.reduce((s, t) => s + t.amount, 0);
     leaks.push({
       id: "tiny-purchases",
-      title: "Tiny frequent purchases",
-      description: `${tiny.length} purchases under KES 300 added up to ${kes(tinySum)} this month — small, but it compounds.`,
+      title: "Small frequent purchases",
+      description: `${tiny.length} purchases under KES 300 added up to ${kes(tinySum)} this month — small each time, but together they're a real number.`,
       monthlyEstimate: tinySum,
       annualEstimate: tinySum * 12,
       severity: severityFor(tinySum * 12, expenses),
@@ -90,7 +90,7 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
     });
   }
 
-  // 5) Weekend overspending
+  // 5) Weekend spending pattern
   const weekday = out.filter((t) => t.date.getDay() >= 1 && t.date.getDay() <= 5);
   const weekend = out.filter((t) => t.date.getDay() === 0 || t.date.getDay() === 6);
   const weekdayDailyAvg = mean(Object.values(groupByDay(weekday)));
@@ -98,9 +98,9 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
   if (weekendDailyAvg > weekdayDailyAvg * 1.3 && weekendDailyAvg > 0) {
     const excess = (weekendDailyAvg - weekdayDailyAvg) * 104; // ~104 weekend days/year
     leaks.push({
-      id: "weekend-overspend",
-      title: "Weekend overspending",
-      description: `You spend ${kes(weekendDailyAvg)}/day on weekends vs ${kes(weekdayDailyAvg)}/day on weekdays — that gap alone.`,
+      id: "weekend-pattern",
+      title: "Weekend spending pattern",
+      description: `Weekends average ${kes(weekendDailyAvg)}/day vs ${kes(weekdayDailyAvg)}/day on weekdays — worth knowing, especially if it's not entirely intentional.`,
       monthlyEstimate: excess / 12,
       annualEstimate: excess,
       severity: severityFor(excess, expenses),
@@ -115,7 +115,7 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
     leaks.push({
       id: "late-night",
       title: "Late-night spending",
-      description: `${kes(nightSum)} spent between 10PM–5AM this month — your highest-risk window for impulse buys.`,
+      description: `${kes(nightSum)} spent between 10PM–5AM this month — a pattern worth noticing if it doesn't match how you'd choose to spend.`,
       monthlyEstimate: nightSum,
       annualEstimate: nightSum * 12,
       severity: severityFor(nightSum * 12, expenses),
@@ -123,14 +123,14 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
     });
   }
 
-  // 7) Duplicate spending
+  // 7) Duplicate charges
   const dupes = curTxns.filter((t) => t.isAnomaly && /duplicate/i.test(t.anomalyReason ?? ""));
   const dupeSum = dupes.reduce((s, t) => s + t.amount, 0);
   if (dupeSum > 0) {
     leaks.push({
       id: "duplicates",
       title: "Duplicate charges",
-      description: `${kes(dupeSum)} billed twice this month across ${dupes.length} transaction${dupes.length === 1 ? "" : "s"} — worth disputing.`,
+      description: `${kes(dupeSum)} billed twice this month across ${dupes.length} transaction${dupes.length === 1 ? "" : "s"} — may be worth raising with the merchant.`,
       monthlyEstimate: dupeSum,
       annualEstimate: dupeSum * 12,
       severity: "high",
@@ -159,8 +159,8 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
     const delta = curDiscretionary - priorDiscretionary;
     leaks.push({
       id: "lifestyle-creep",
-      title: "Lifestyle creep",
-      description: `Discretionary spend (entertainment, shopping, dining, travel) is up ${Math.round(((curDiscretionary - priorDiscretionary) / priorDiscretionary) * 100)}% vs 3 months ago.`,
+      title: "Rising discretionary spend",
+      description: `Discretionary spend (entertainment, shopping, dining, travel) is up ${Math.round(((curDiscretionary - priorDiscretionary) / priorDiscretionary) * 100)}% vs 3 months ago — worth knowing if that matches how you want things to look.`,
       monthlyEstimate: delta,
       annualEstimate: delta * 12,
       severity: severityFor(delta * 12, expenses),
@@ -181,9 +181,9 @@ export function detectLeaks(curTxns: Transaction[], allTxns: Transaction[], expe
   }
   if (splurge > 0) {
     leaks.push({
-      id: "salary-splurge",
-      title: "Salary-day splurging",
-      description: `You spend noticeably more in the 3 days right after income lands — ${kes(splurge)} above your usual pace this month.`,
+      id: "payday-spending",
+      title: "Spending right after payday",
+      description: `Spending noticeably picks up in the 3 days right after income lands — ${kes(splurge)} above your usual pace this month.`,
       monthlyEstimate: splurge,
       annualEstimate: splurge * 12,
       severity: severityFor(splurge * 12, expenses),

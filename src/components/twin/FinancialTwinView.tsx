@@ -85,14 +85,14 @@ export default function FinancialTwinView({ twin }: { twin: FinancialTwin }) {
                   {twin.depletionDate}
                 </div>
                 <div style={{ fontSize: 12.5, color: "#9aa7bd", marginTop: 3 }}>
-                  Estimated date your available cash reaches zero at this spending pace ({twin.depletionRisk} risk).
+                  A possibility worth knowing: available cash could run low around here at this pace ({twin.depletionRisk} sense of urgency).
                 </div>
               </div>
             </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#34d399", boxShadow: "0 0 10px #34d399", flexShrink: 0 }} />
-              <div style={{ fontSize: 13.5, color: "#cdd6e4" }}>Your cash isn&apos;t depleting — net cashflow is positive at your current pace.</div>
+              <div style={{ fontSize: 13.5, color: "#cdd6e4" }}>Cash flow looks positive at your current pace — no depletion in sight.</div>
             </div>
           )}
         </div>

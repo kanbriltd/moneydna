@@ -22,9 +22,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MoneyDNA AI — Your money tells a story",
+  title: "MoneyDNA — Discover Your Financial DNA",
   description:
-    "AI-powered financial intelligence. Drop in your M-PESA or bank statement and MoneyDNA decodes your spending DNA, forecasts cashflow, and coaches you toward a stronger saving culture.",
+    "Every paycheck creates possibilities. MoneyDNA helps you understand the financial choices available today and how they could shape your future.",
 };
 
 export default function RootLayout({

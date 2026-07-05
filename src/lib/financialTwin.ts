@@ -178,13 +178,13 @@ export async function buildFinancialTwin(userId: string, analytics: AnalyticsRes
   // ---------- explanation ----------
   let explanation: string;
   if (depletionRisk === "high") {
-    explanation = `At your current pace, cash runs out around ${depletionDate} — the most urgent thing to fix.`;
+    explanation = `At the current pace, available cash could run low around ${depletionDate} — worth exploring options before then.`;
   } else if (debtRiskLevel === "High" || debtRiskLevel === "Critical") {
-    explanation = `Debt risk is running ${debtRiskLevel.toLowerCase()}${fulizaTrendingUp ? ", and Fuliza usage is trending up" : ""} — worth addressing before it compounds.`;
+    explanation = `Debt risk is running ${debtRiskLevel.toLowerCase()}${fulizaTrendingUp ? ", and Fuliza usage is trending up" : ""} — one possibility worth exploring is easing that before it grows further.`;
   } else if (upcomingRecurring.length > 0) {
     explanation = `${upcomingRecurring.length} recurring payment${upcomingRecurring.length === 1 ? "" : "s"} likely due in the next 30 days, totalling ~${Math.round(upcomingRecurring.reduce((s, r) => s + r.expectedAmount, 0)).toLocaleString()} KES.`;
   } else {
-    explanation = "No major risks detected in your projected trajectory — your current pattern looks sustainable.";
+    explanation = "Your projected trajectory looks steady — the current pattern seems sustainable.";
   }
 
   return {

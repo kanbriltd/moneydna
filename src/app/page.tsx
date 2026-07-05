@@ -4,12 +4,12 @@ import Particles from "@/components/ui/Particles";
 import Logo from "@/components/ui/Logo";
 
 const FEATURES = [
-  { icon: "🧬", title: "Spending DNA", body: "A behavioural fingerprint of how you really spend — and what it reveals about your money habits." },
-  { icon: "📊", title: "Live dashboards", body: "Animated health score, savings rate, cashflow river and burn rate — your money at a glance." },
-  { icon: "🔮", title: "Cashflow forecast", body: "Predict your balance 7, 30 and 90 days out with confidence bands and shortfall alerts." },
-  { icon: "✦", title: "AI Wealth Coach", body: "Ask anything. Get concrete, numbers-backed answers built from your own transaction history." },
+  { icon: "🧬", title: "Your Financial DNA", body: "A behavioural fingerprint of how you really spend, save and grow money — and what it reveals about the possibilities ahead of you." },
+  { icon: "📊", title: "Understand, don't just track", body: "Health score, savings rate, cashflow — framed as what they mean for your future, not just numbers on a screen." },
+  { icon: "🔮", title: "See what could happen", body: "Explore your balance 7, 30 and 90 days out, and what today's choices could mean months from now." },
+  { icon: "✦", title: "Your Financial Companion", body: "Ask anything. Get thoughtful, numbers-backed possibilities built from your own transaction history — never a lecture." },
   { icon: "🇰🇪", title: "Built for M-PESA", body: "Understands Paybill, Till, Fuliza, M-Shwari and Send Money — not just generic bank rows." },
-  { icon: "🛡️", title: "Saving culture", body: "Streaks, goals and nudges that make putting money aside a habit you actually keep." },
+  { icon: "🛡️", title: "Confidence, one paycheck at a time", body: "Streaks, goals and gentle nudges that turn good decisions into a habit you actually keep." },
 ];
 
 const btnPrimary: React.CSSProperties = {
@@ -70,22 +70,22 @@ export default async function LandingPage() {
         <div style={{ maxWidth: 1000, margin: "0 auto", padding: "64px 32px 30px", textAlign: "center", position: "relative" }}>
           <div className="font-mono-jb" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 14px", borderRadius: 999, background: "rgba(52,211,153,.08)", border: "1px solid rgba(52,211,153,.22)", fontSize: 12.5, color: "#7fe9c4", letterSpacing: ".5px", marginBottom: 30 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#34d399", boxShadow: "0 0 10px #34d399", animation: "mdGlowPulse 2s infinite" }} />
-            FINANCIAL INTELLIGENCE · FOR EVERYONE
+            YOUR FINANCIAL COMPANION
           </div>
           <h1 className="font-space" style={{ fontWeight: 700, fontSize: 62, lineHeight: 1.04, letterSpacing: "-1.5px", marginBottom: 22 }}>
-            Your money tells a story.
+            Discover Your
             <br />
-            <span style={{ background: "linear-gradient(110deg,#2f81f7,#34d399 55%,#a371f7)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>MoneyDNA reveals it.</span>
+            <span style={{ background: "linear-gradient(110deg,#2f81f7,#34d399 55%,#a371f7)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>Financial DNA.</span>
           </h1>
           <p style={{ maxWidth: 620, margin: "0 auto 38px", fontSize: 18, lineHeight: 1.6, color: "#9aa7bd" }}>
-            Drop in your M-PESA or bank statement. In seconds our AI extracts every transaction, decodes your spending DNA, forecasts cashflow, and coaches you toward a stronger saving culture.
+            Every paycheck creates possibilities. MoneyDNA helps you understand the financial choices available today and how they could shape your future.
           </p>
           <div style={{ display: "flex", gap: 14, justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}>
             <Link href="/upload" style={btnPrimary}>
-              Analyze my statement <span style={{ fontSize: 18 }}>→</span>
+              Discover My Financial DNA <span style={{ fontSize: 18 }}>→</span>
             </Link>
             <Link href="/demo" style={btnSecondary}>
-              View live demo
+              See it in action
             </Link>
           </div>
           <div className="font-mono-jb" style={{ marginTop: 20, fontSize: 12.5, color: "#5f6b80" }}>🔒 Processed privately · no statement stored by default</div>
@@ -108,7 +108,7 @@ export default async function LandingPage() {
         <div style={{ maxWidth: 1120, margin: "80px auto 0", padding: "0 32px" }}>
           <div style={{ textAlign: "center", marginBottom: 44 }}>
             <div className="font-mono-jb" style={{ fontSize: 12.5, color: "#34d399", letterSpacing: 1, marginBottom: 12 }}>WHAT YOU GET</div>
-            <h2 className="font-space" style={{ fontWeight: 700, fontSize: 34, letterSpacing: "-.5px" }}>A command center for your money</h2>
+            <h2 className="font-space" style={{ fontWeight: 700, fontSize: 34, letterSpacing: "-.5px" }}>Clarity, confidence, and hope — every time you open it</h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
             {FEATURES.map((f) => (
@@ -123,10 +123,10 @@ export default async function LandingPage() {
 
         <div style={{ maxWidth: 1120, margin: "64px auto 0", padding: "0 32px 80px" }}>
           <div style={{ borderRadius: 22, padding: "48px 40px", textAlign: "center", background: "radial-gradient(700px 300px at 50% 0%,rgba(52,211,153,.16),transparent 70%),linear-gradient(180deg,rgba(17,24,39,.7),rgba(10,16,28,.5))", border: "1px solid rgba(52,211,153,.18)" }}>
-            <h2 className="font-space" style={{ fontWeight: 700, fontSize: 30, letterSpacing: "-.5px", marginBottom: 14 }}>Ready to meet your money?</h2>
+            <h2 className="font-space" style={{ fontWeight: 700, fontSize: 30, letterSpacing: "-.5px", marginBottom: 14 }}>Ready to meet your Financial DNA?</h2>
             <p style={{ color: "#9aa7bd", fontSize: 16, marginBottom: 26 }}>It takes one statement and about ten seconds.</p>
             <Link href="/upload" style={{ ...btnPrimary, display: "inline-flex" }}>
-              Upload statement →
+              Discover My Financial DNA →
             </Link>
           </div>
         </div>

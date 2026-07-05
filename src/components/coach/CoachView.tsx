@@ -74,7 +74,7 @@ export default function CoachView({ initialMessages, hasData }: { initialMessage
         </div>
         <div>
           <div className="font-space" style={{ fontWeight: 700, fontSize: 18 }}>
-            Wealth Coach
+            Financial Companion
           </div>
           <div style={{ fontSize: 12.5, color: "#34d399", display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#34d399", boxShadow: "0 0 8px #34d399" }} />
