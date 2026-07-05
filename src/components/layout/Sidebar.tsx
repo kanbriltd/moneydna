@@ -8,6 +8,7 @@ import Logo from "@/components/ui/Logo";
 const NAV = [
   { key: "dashboard", label: "Dashboard", icon: "◈", href: "/dashboard" },
   { key: "analytics", label: "Analytics", icon: "◑", href: "/analytics" },
+  { key: "twin", label: "Financial Twin", icon: "◭", href: "/twin" },
   { key: "simulator", label: "What-If Simulator", icon: "◎", href: "/simulator" },
   { key: "coach", label: "Wealth Coach", icon: "✦", href: "/coach" },
 ];
