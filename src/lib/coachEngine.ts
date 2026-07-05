@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { AnalyticsResult } from "@/lib/analytics";
 import { kes } from "@/lib/format";
+import { guardrailFor, type GuardrailCategory } from "@/lib/coachGuardrails";
 
 function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -37,16 +38,28 @@ export async function answerCoachQuestion(
   analytics: AnalyticsResult,
   history: { role: "user" | "assistant"; content: string }[]
 ): Promise<string> {
+  // ---- Guardrails run first (safety + intelligence layer) ----
+  const guard = guardrailFor(question);
+  if (guard?.blockLLM && guard.response) {
+    // Hard guardrail (e.g. crisis): return the safe reply without calling the model.
+    return mdBoldToHtml(guard.response);
+  }
+
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (apiKey) {
     try {
-      return await answerWithClaude(question, analytics, history, apiKey);
+      return await answerWithClaude(question, analytics, history, apiKey, guard?.systemNote);
     } catch (err) {
       // Log the real reason so failures are visible in the server console
       // instead of silently degrading to the rule-based fallback.
       console.error("[coachEngine] Claude API call failed, falling back to rule-based engine:", err);
     }
   }
+
+  // If a soft guardrail applied but the model is unavailable, use a safe
+  // category fallback instead of the generic rule-based engine.
+  if (guard && !guard.blockLLM) return mdBoldToHtml(softFallback(guard.category, analytics));
+
   return ruleBasedAnswer(question, analytics);
 }
 
@@ -54,10 +67,14 @@ async function answerWithClaude(
   question: string,
   analytics: AnalyticsResult,
   history: { role: "user" | "assistant"; content: string }[],
-  apiKey: string
+  apiKey: string,
+  guardNote?: string
 ): Promise<string> {
   const client = new Anthropic({ apiKey });
-  const system = `${COMPANION_VOICE} Answer the user's question about their money using ONLY the financial summary below — be concrete, cite real numbers from it, and keep replies under 90 words. Frame possibilities like pay-yourself-first, automatic transfers and emergency funds as options, not instructions. Use **double asterisks** for the 2-4 most important numbers/phrases so they render bold. Do not invent numbers not implied by the summary.\n\nFINANCIAL SUMMARY:\n${summarize(analytics)}`;
+  const system =
+    `${COMPANION_VOICE} Answer the user's question about their money using ONLY the financial summary below — be concrete, cite real numbers from it, and keep replies under 90 words. Frame possibilities like pay-yourself-first, automatic transfers and emergency funds as options, not instructions. Use **double asterisks** for the 2-4 most important numbers/phrases so they render bold. Do not invent numbers not implied by the summary.` +
+    (guardNote ? `\n\n${guardNote}` : "") +
+    `\n\nFINANCIAL SUMMARY:\n${summarize(analytics)}`;
 
   const msg = await client.messages.create({
     model: "claude-sonnet-5",
@@ -67,6 +84,26 @@ async function answerWithClaude(
   });
   const text = msg.content.filter((b) => b.type === "text").map((b) => (b as { text: string }).text).join("\n").trim();
   return mdBoldToHtml(text || "I couldn't come up with an answer just now — try rephrasing?");
+}
+
+/** Safe, guardrail-respecting replies used only when the LLM is unavailable. */
+function softFallback(category: GuardrailCategory, a: AnalyticsResult): string {
+  switch (category) {
+    case "REGULATED_ADVICE":
+      return `I can't point you to a specific product — I'm a guide, not a licensed advisor. What I can do is help you weigh the trade-offs (fees, risk, liquidity, whether it's CMA-regulated, and scam red flags). For a pick tailored to you, a licensed advisor is the right call.`;
+    case "BLIND_SPOT":
+      return `From the statement I can see, you kept **${a.savingsRate.toFixed(0)}%** this period. I only see this one statement though — not your other accounts, cash, SACCO, assets or any mobile loans — so treat this as a trendline, not your full net worth. Adding your other accounts would sharpen it.`;
+    case "FALSE_PRECISION":
+      return `I can't give an exact figure — the future depends on returns, income and life that nobody can predict. One possibility is a **range** with clear assumptions instead. Want me to sketch a low/likely/high path?`;
+    case "BLACK_TAX":
+      return `Supporting family is real and valid — the goal isn't to stop, it's to make it **intentional**. One possibility: deciding a set monthly family-support amount in advance so your own goals still get funded and giving stays a choice, not an unplanned leak.`;
+    case "EMOTIONAL_DISTRESS":
+      return `That's a heavy feeling, and struggling with money is far more common than it looks — it's not a character flaw. One small step is enough for today. If it feels bigger than money alone, talking to someone you trust could really help.`;
+    case "DEBT_TRAP":
+      return `If high-interest loans are in the mix, investing can wait — clearing them **is** the best return available. One possibility: pause new borrowing, list the balances, and put whatever you can toward the priciest one first, keeping just a small buffer. This is a cycle to break, not a failing.`;
+    default:
+      return ruleBasedAnswer("", a);
+  }
 }
 
 export interface DailyBriefing {
