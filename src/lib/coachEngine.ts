@@ -39,8 +39,10 @@ export async function answerCoachQuestion(
   if (apiKey) {
     try {
       return await answerWithClaude(question, analytics, history, apiKey);
-    } catch {
-      // fall through to deterministic engine on any API failure
+    } catch (err) {
+      // Log the real reason so failures are visible in the server console
+      // instead of silently degrading to the rule-based fallback.
+      console.error("[coachEngine] Claude API call failed, falling back to rule-based engine:", err);
     }
   }
   return ruleBasedAnswer(question, analytics);
@@ -56,7 +58,7 @@ async function answerWithClaude(
   const system = `You are the Wealth Coach inside MoneyDNA AI, a personal/small-business finance app. Answer the user's question about their money using ONLY the financial summary below — be concrete, cite real numbers from it, and keep replies under 90 words. Promote a strong saving culture (pay-yourself-first, automatic transfers, emergency funds). Use **double asterisks** for the 2-4 most important numbers/phrases so they render bold. Do not invent numbers not implied by the summary.\n\nFINANCIAL SUMMARY:\n${summarize(analytics)}`;
 
   const msg = await client.messages.create({
-    model: "claude-sonnet-4-5",
+    model: "claude-sonnet-5",
     max_tokens: 400,
     system,
     messages: [...history.slice(-8).map((h) => ({ role: h.role, content: h.content })), { role: "user" as const, content: question }],
