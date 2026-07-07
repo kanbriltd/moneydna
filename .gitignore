@@ -45,3 +45,6 @@ next-env.d.ts
 # sqlite database
 /prisma/*.db
 /prisma/*.db-journal
+
+# Allow the safe template to be committed
+!.env.example
