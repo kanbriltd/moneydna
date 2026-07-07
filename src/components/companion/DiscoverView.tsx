@@ -52,8 +52,8 @@ export default function DiscoverView({
           </h1>
           <p style={{ color: "#8a97ad", fontSize: 15.5, lineHeight: 1.6, marginBottom: 26 }}>
             Before we talk about money, I want to understand who you are. A few gentle questions —
-            no statements, no numbers — and I'll reveal your <b style={{ color: "#e8edf6" }}>Financial DNA</b>.
-            I'll remember it from then on.
+            no statements, no numbers — and I&rsquo;ll reveal your <b style={{ color: "#e8edf6" }}>Financial DNA</b>.
+            I&rsquo;ll remember it from then on.
           </p>
           <button onClick={() => setStarted(true)} style={primaryBtn}>
             Begin {"\u2192"}

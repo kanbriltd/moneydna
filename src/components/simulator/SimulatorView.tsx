@@ -22,7 +22,7 @@ export default function SimulatorView({ suggestedMonthly }: { suggestedMonthly: 
         See what future-you could be worth
       </h1>
       <p style={{ color: "#8a97ad", fontSize: 15, margin: "0 0 26px", lineHeight: 1.5 }}>
-        Small amounts become large over time — that's compounding. Move the sliders and watch it.
+        Small amounts become large over time — that&rsquo;s compounding. Move the sliders and watch it.
       </p>
 
       {/* Headline */}
