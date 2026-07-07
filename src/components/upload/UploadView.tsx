@@ -45,7 +45,7 @@ export default function UploadView() {
       }
       setStep(STEPS.length - 1);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/today");
         router.refresh();
       }, 500);
     } catch {
@@ -72,7 +72,7 @@ export default function UploadView() {
       }
       setStep(STEPS.length - 1);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/today");
         router.refresh();
       }, 400);
     } catch {

@@ -24,6 +24,11 @@ model User {
   transactions Transaction[]
   goals        Goal[]
   chatMessages ChatMessage[]
+
+  companionProfile CompanionProfile?
+  events           Event[]
+  moneySituation   MoneySituation?
+  decisions        DailyDecision[]
 }
 
 model Statement {
@@ -87,5 +92,108 @@ model ChatMessage {
   content   String
   createdAt DateTime @default(now())
 
+  @@index([userId, createdAt])
+}
+
+// The persistent "memory" that makes MoneyDNA a companion instead of a chatbot.
+// One row per user. This is the human model every AI response draws on, and the
+// seed of the Financial Behaviour Graph (the moat).
+model CompanionProfile {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // --- Discovery answers (who the user is) ---
+  moneyStory   String?  // how money worked growing up (scarcity / comfort / chaos)
+  temperament  String?  // spender | saver | balanced
+  planning     String?  // planner | spontaneous
+  riskComfort  String?  // cautious | moderate | bold
+  lifeStage    String?  // student | earlyCareer | family | established
+  supportsFamily Boolean @default(false)
+  goodLife     String?  // freedom | security | status | family | adventure | legacy
+  biggestFear  String?  // free-text or enum key
+  futureVision String?  // the life they're picturing, in their words
+
+  // --- Derived Financial DNA (the reveal) ---
+  dnaType        String?  // archetype key, e.g. "builder"
+  dnaLabel       String?  // human label, e.g. "The Builder"
+  dnaSummary     String?  // the personalised reveal text
+  dnaConfidence  Int      @default(0) // 0..100, rises as data confirms the profile
+
+  // --- Confidence tracking (the product's core metric) ---
+  confidenceScore Int?    // 0..100 self-reported / derived confidence
+  confidenceSetAt DateTime?
+
+  // --- 5 evolving DNA traits (seed + evolve from behaviour) ---
+  traitSaver      Int @default(50)
+  traitPlanner    Int @default(50)
+  traitImpulse    Int @default(50)
+  traitRisk       Int @default(50)
+  traitDiscipline Int @default(50)
+
+  discoveryComplete Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// Lightweight event log — the instrumentation that turns the app into evidence.
+// Every meaningful action is recorded so retention, funnel, and engagement can
+// be measured from day one (this is what answers the investor's 3/10 traction).
+model Event {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   // e.g. "discovery_started", "dna_revealed", "app_opened"
+  props     String?  // optional JSON string of extra context
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([name, createdAt])
+}
+
+// The 4–5 manual money inputs captured right after the Financial DNA reveal.
+// Lets the engine work with ZERO connected statements (manual-first).
+model MoneySituation {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  monthlyIncome  Float?
+  monthlySavings Float?
+  paydayDay      Int?   // 1..31
+  topExpense1    String?
+  topExpense2    String?
+  hasDebt        Boolean @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// One decision per user per day + the feedback loop (the behavioural gold).
+model DailyDecision {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  forDate         String   // "YYYY-MM-DD" (the user's day)
+  kind            String
+  title           String
+  body            String
+  insight         String   @default("")
+  estimatedImpact Float    @default(0)
+  goalName        String?
+  confidence      String   @default("medium") // high | medium | low
+  status          String   @default("pending") // pending | followed | skipped
+  skipReason      String?
+  createdAt       DateTime @default(now())
+
+  // --- Evidence-first reasoning fields ---
+  why         String  @default("")
+  basedOn     String  @default("[]") // JSON array of strings
+  band        String  @default("low") // high | medium | low
+  historyNote String?
+
+  @@unique([userId, forDate])
   @@index([userId, createdAt])
 }

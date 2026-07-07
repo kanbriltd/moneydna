@@ -24,7 +24,7 @@ function LoginForm() {
       setError("Incorrect email or password.");
       return;
     }
-    router.push(params.get("callbackUrl") || "/dashboard");
+    router.push(params.get("callbackUrl") || "/today");
     router.refresh();
   }
 

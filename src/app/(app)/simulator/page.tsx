@@ -1,23 +1,19 @@
 import { auth } from "@/auth";
 import { getAnalytics } from "@/lib/analytics";
-import { runWhatIf } from "@/lib/whatIf";
 import SimulatorView from "@/components/simulator/SimulatorView";
-import EmptyState from "@/components/layout/EmptyState";
 
 export default async function SimulatorPage() {
   const session = await auth();
   const userId = session!.user!.id;
-  const analytics = await getAnalytics(userId);
+  const a = await getAnalytics(userId);
 
-  if (!analytics.hasData) {
-    return (
-      <EmptyState
-        title="No statement yet"
-        body="Upload a statement (or use the sample dataset) and you'll be able to simulate what-if scenarios against your real numbers."
-      />
-    );
-  }
+  // Suggest a starting monthly: this month's net saving, else 10% of income, else 5,000.
+  const suggested =
+    Math.round(a.kpis.net) > 0
+      ? Math.round(a.kpis.net)
+      : a.kpis.income > 0
+      ? Math.round(a.kpis.income * 0.1)
+      : 5000;
 
-  const initial = await runWhatIf(userId, {});
-  return <SimulatorView initial={initial} />;
+  return <SimulatorView suggestedMonthly={Math.max(500, suggested)} />;
 }

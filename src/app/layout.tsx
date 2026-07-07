@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Manrope, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, Manrope, JetBrains_Mono, Cormorant_Garamond, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 
@@ -21,6 +21,25 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600", "700"],
 });
 
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
+
 export const metadata: Metadata = {
   title: "MoneyDNA — Discover Your Financial DNA",
   description:
@@ -35,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${manrope.variable} ${jetbrainsMono.variable}`}
+      className={`${spaceGrotesk.variable} ${manrope.variable} ${jetbrainsMono.variable} ${cormorant.variable} ${inter.variable} ${plexMono.variable}`}
     >
       <body>
         <Providers>{children}</Providers>

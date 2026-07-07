@@ -63,10 +63,10 @@ export default function BlueprintView({ detectedIncome, userName }: { detectedIn
         ✦ SALARY BLUEPRINT™
       </div>
       <h1 className="font-space" style={{ fontSize: 30, fontWeight: 700, margin: "0 0 6px" }}>
-        You just got paid, {userName}. Here&apos;s the plan.
+        You just got paid, {userName}. Here's the plan.
       </h1>
       <p style={{ color: "#8a97ad", fontSize: 15, margin: "0 0 24px", lineHeight: 1.5 }}>
-        Enter your monthly income and I&apos;ll turn it into a personalised plan — what to save, invest, and spend — in seconds.
+        Enter your monthly income and I'll turn it into a personalised plan — what to save, invest, and spend — in seconds.
       </p>
 
       {/* Input card */}

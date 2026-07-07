@@ -37,7 +37,7 @@ export default function DemoPage() {
         const demoRes = await fetch("/api/statements/demo", { method: "POST" });
         if (!demoRes.ok) throw new Error("demo seed failed");
         if (cancelled) return;
-        router.push("/dashboard");
+        router.push("/today");
         router.refresh();
       } catch {
         if (!cancelled) setStage("Something went wrong setting up the demo — try again.");

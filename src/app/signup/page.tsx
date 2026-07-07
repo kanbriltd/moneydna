@@ -48,7 +48,7 @@ export default function SignupPage() {
       router.push("/login");
       return;
     }
-    router.push("/upload");
+    router.push("/today");
     router.refresh();
   }
 

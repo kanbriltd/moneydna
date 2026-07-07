@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import Sidebar from "@/components/layout/Sidebar";
+import MobileTabBar from "@/components/layout/MobileTabBar";
+import AmbientBackground from "@/components/ui/AmbientBackground";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -12,11 +14,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="md-page-bg" style={{ display: "flex" }}>
-      <div className="md-grid-bg" />
+      <AmbientBackground seed={(user.name?.charCodeAt(0) ?? 7) + user.name.length} />
       <div style={{ position: "relative", zIndex: 2, display: "flex", width: "100%" }}>
         <Sidebar name={user.name} businessName={user.businessName} streakMonths={user.streakMonths} />
-        <div style={{ flex: 1, minWidth: 0 }}>{children}</div>
+        <div className="md-app-content" style={{ flex: 1, minWidth: 0 }}>
+          {children}
+        </div>
       </div>
+      <MobileTabBar />
     </div>
   );
 }

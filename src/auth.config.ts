@@ -1,6 +1,22 @@
 import type { NextAuthConfig } from "next-auth";
 
-const PROTECTED_PREFIXES = ["/dashboard", "/analytics", "/coach", "/upload"];
+const PROTECTED_PREFIXES = [
+  "/dashboard",
+  "/analytics",
+  "/coach",
+  "/upload",
+  "/today",
+  "/discover",
+  "/memory",
+  "/goals",
+  "/history",
+  "/settings",
+  "/blueprint",
+  "/simulator",
+  "/pilot",
+  "/twin",
+  "/wealth-projection",
+];
 
 export const authConfig = {
   trustHost: true,

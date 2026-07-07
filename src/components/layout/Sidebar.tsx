@@ -5,15 +5,58 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Logo from "@/components/ui/Logo";
 
-const NAV = [
-  { key: "dashboard", label: "Dashboard", icon: "◈", href: "/dashboard" },
-  { key: "analytics", label: "Analytics", icon: "◑", href: "/analytics" },
-  { key: "blueprint", label: "Salary Blueprint", icon: "◆", href: "/blueprint" },
-  { key: "twin", label: "Financial Twin", icon: "◭", href: "/twin" },
-  { key: "simulator", label: "What-If Simulator", icon: "◎", href: "/simulator" },
-  { key: "wealth-projection", label: "Wealth Projection", icon: "⟡", href: "/wealth-projection" },
-  { key: "coach", label: "Financial Companion", icon: "✦", href: "/coach" },
+// The center of the app: one better decision every morning. Everything else supports it.
+const PRIMARY_NAV = [
+  { key: "today", label: "Today's Best Move", icon: "☀", href: "/today" },
+  { key: "discover", label: "Financial DNA", icon: "🧬", href: "/discover" },
+  { key: "memory", label: "Memory", icon: "🧠", href: "/memory" },
+  { key: "goals", label: "Goals", icon: "🎯", href: "/goals" },
+  { key: "insights", label: "Insights", icon: "◑", href: "/analytics" },
+  { key: "history", label: "History", icon: "📅", href: "/history" },
+  { key: "settings", label: "Settings", icon: "⚙", href: "/settings" },
 ];
+
+const TOOLS_NAV = [
+  { key: "dashboard", label: "Dashboard", icon: "◈", href: "/dashboard" },
+  { key: "blueprint", label: "Salary Blueprint", icon: "◆", href: "/blueprint" },
+  { key: "simulator", label: "Wealth Simulator", icon: "◎", href: "/simulator" },
+  { key: "coach", label: "Wealth Coach", icon: "✦", href: "/coach" },
+  { key: "pilot", label: "Pilot", icon: "◇", href: "/pilot" },
+];
+
+function NavItem({
+  item,
+  active,
+  dim,
+}: {
+  item: { key: string; label: string; icon: string; href: string };
+  active: boolean;
+  dim?: boolean;
+}) {
+  return (
+    <Link
+      href={item.href}
+      style={{
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: dim ? "9px 13px" : "11px 13px",
+        borderRadius: 11,
+        fontSize: dim ? 13.5 : 14.5,
+        fontWeight: 600,
+        color: active ? "#e8edf6" : dim ? "#6b7a8f" : "#8a97ad",
+        background: active ? "rgba(52,211,153,.1)" : "transparent",
+        border: `1px solid ${active ? "rgba(52,211,153,.22)" : "rgba(255,255,255,0)"}`,
+        textDecoration: "none",
+        flexShrink: 0,
+      }}
+    >
+      <span style={{ fontSize: dim ? 14 : 16, width: 20, textAlign: "center" }}>{item.icon}</span>
+      {item.label}
+    </Link>
+  );
+}
 
 export default function Sidebar({
   name,
@@ -34,12 +77,12 @@ export default function Sidebar({
 
   return (
     <div
+      className="md-sidebar"
       style={{
         width: 248,
         flexShrink: 0,
         borderRight: "1px solid rgba(255,255,255,.07)",
         padding: "24px 18px",
-        display: "flex",
         flexDirection: "column",
         gap: 6,
         position: "sticky",
@@ -53,32 +96,21 @@ export default function Sidebar({
         <Logo size={32} />
       </div>
 
-      {NAV.map((n) => {
-        const on = pathname?.startsWith(n.href);
-        return (
-          <Link
-            key={n.key}
-            href={n.href}
-            style={{
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "11px 13px",
-              borderRadius: 11,
-              fontSize: 14.5,
-              fontWeight: 600,
-              color: on ? "#e8edf6" : "#8a97ad",
-              background: on ? "rgba(52,211,153,.1)" : "transparent",
-              border: `1px solid ${on ? "rgba(52,211,153,.22)" : "rgba(255,255,255,0)"}`,
-              textDecoration: "none",
-            }}
-          >
-            <span style={{ fontSize: 16, width: 20, textAlign: "center" }}>{n.icon}</span>
-            {n.label}
-          </Link>
-        );
-      })}
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto", display: "flex", flexDirection: "column", gap: 5 }}>
+        {PRIMARY_NAV.map((n) => (
+          <NavItem key={n.key} item={n} active={!!pathname?.startsWith(n.href)} />
+        ))}
+
+        <div
+          className="font-mono-jb"
+          style={{ color: "#5d6b80", fontSize: 10.5, letterSpacing: ".7px", padding: "16px 13px 6px" }}
+        >
+          TOOLS
+        </div>
+        {TOOLS_NAV.map((n) => (
+          <NavItem key={n.key} item={n} active={!!pathname?.startsWith(n.href)} dim />
+        ))}
+      </div>
 
       <div
         style={{

@@ -8,6 +8,19 @@
 
 :root {
   color-scheme: dark;
+
+  /* MoneyDNA palette — calm, intelligent, hopeful. Never pure black. */
+  --md-bg: #0a1020;
+  --md-bg-deep: #070b16;
+  --md-card: #121a2f;
+  --md-card-2: #0e1526;
+  --md-text: #f5f6fa;
+  --md-text-dim: #a3b1c6;
+  --md-text-faint: #6b7891;
+  --md-hope: #49e6b3; /* hope accent */
+  --md-gold: #d9b36c; /* warm gold */
+  --md-lavender: #8e8cff; /* lavender */
+  --md-line: rgba(255, 255, 255, 0.07);
 }
 
 * {
@@ -16,9 +29,9 @@
 
 html,
 body {
-  background: #05070e;
-  color: #e8edf6;
-  font-family: var(--font-manrope), sans-serif;
+  background: var(--md-bg);
+  color: var(--md-text);
+  font-family: var(--font-inter), var(--font-manrope), sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -113,6 +126,49 @@ body {
 .font-mono-jb {
   font-family: var(--font-jetbrains-mono), monospace;
 }
+.font-serif-display,
+.font-display {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+/* Numbers only: money, %, confidence, evidence, dates */
+.font-num {
+  font-family: var(--font-plex-mono), var(--font-jetbrains-mono), monospace;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+
+/* Quiet-luxury Today page */
+@keyframes mdGoldBreathe {
+  0%,
+  100% {
+    box-shadow: 0 0 40px rgba(201, 163, 92, 0.18), 0 0 90px rgba(201, 163, 92, 0.07);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(201, 163, 92, 0.32), 0 0 130px rgba(201, 163, 92, 0.12);
+  }
+}
+.md-gold-glow {
+  animation: mdGoldBreathe 4.5s ease-in-out infinite;
+}
+
+/* Responsive app shell: sidebar on desktop, bottom tab bar on mobile */
+.md-sidebar {
+  display: flex;
+}
+.md-tabbar {
+  display: none;
+}
+@media (max-width: 860px) {
+  .md-sidebar {
+    display: none;
+  }
+  .md-tabbar {
+    display: flex;
+  }
+  .md-app-content {
+    padding-bottom: 84px;
+  }
+}
 
 .md-grid-bg {
   position: fixed;
@@ -129,6 +185,97 @@ body {
   min-height: 100vh;
   width: 100%;
   position: relative;
-  background: radial-gradient(1200px 700px at 80% -10%, rgba(46, 99, 247, 0.16), transparent 60%),
-    radial-gradient(900px 600px at 0% 100%, rgba(52, 211, 153, 0.12), transparent 55%), #05070e;
+  background: radial-gradient(1200px 760px at 82% -12%, rgba(142, 140, 255, 0.1), transparent 60%),
+    radial-gradient(1000px 640px at 2% 108%, rgba(73, 230, 179, 0.09), transparent 55%),
+    radial-gradient(900px 900px at 50% 40%, rgba(18, 26, 47, 0.5), transparent 70%), var(--md-bg);
+}
+
+/* Living atmosphere — almost imperceptible aurora drift + breathing stars */
+@keyframes mdAuroraDrift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate3d(4%, -3%, 0) scale(1.12);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.5;
+  }
+}
+@keyframes mdStarBreathe {
+  0%,
+  100% {
+    opacity: 0.28;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+@keyframes mdStarArrive {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.md-aurora {
+  position: fixed;
+  inset: -20%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(60px);
+  will-change: transform, opacity;
+}
+
+.md-btn-primary {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+.md-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(73, 230, 179, 0.32);
+  filter: brightness(1.04);
+}
+.md-btn-primary:active {
+  transform: translateY(0);
+}
+.md-btn-ghost {
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+.md-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.26);
+  transform: translateY(-1px);
+}
+.md-hero-card {
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.md-hero-card:hover {
+  border-color: rgba(52, 211, 153, 0.3);
+  box-shadow: 0 28px 70px -20px rgba(52, 211, 153, 0.16), 0 0 0 1px rgba(52, 211, 153, 0.05) inset;
+}
+.md-shimmer-line {
+  position: relative;
+  overflow: hidden;
+}
+.md-shimmer-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.16), transparent);
+  animation: mdSheen 3.2s ease-in-out infinite;
+}
+.md-input {
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.md-input:focus {
+  border-color: rgba(52, 211, 153, 0.45) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
 }

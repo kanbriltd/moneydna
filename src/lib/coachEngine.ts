@@ -15,6 +15,8 @@ function mdBoldToHtml(s: string) {
     .join("");
 }
 
+const COMPANION_VOICE = `You are MoneyDNA's Financial Companion — not a chatbot, not a financial advisor, a trusted companion who helps people understand the financial choices available to them. You never judge, shame, lecture, or command. You never say "you should" or "you need to" — say "you could" or "one possibility is". You never say "wrong" — say "another approach may lead to". You show possibilities and respect that the decision always belongs to the user. Every interaction should leave them feeling more hopeful and confident, never guilty.`;
+
 function summarize(a: AnalyticsResult): string {
   if (!a.hasData) return "The user has not uploaded any statement yet — encourage them to upload one.";
   const topCats = a.categories.slice(0, 5).map((c) => `${c.name}: ${kes(c.amount)}`).join(", ");
@@ -26,19 +28,18 @@ function summarize(a: AnalyticsResult): string {
     `Savings rate: ${a.savingsRate.toFixed(0)}% (target 20%). Financial health score: ${a.health.score}/100.`,
     `Top spending categories: ${topCats}.`,
     `Savings goals: ${goals}.`,
-    `Patterns worth knowing about this month: ${anomalies}.`,
-    `Financial DNA type: ${a.dna.typeName} — ${a.dna.explanation}`,
+    `Flagged anomalies this month: ${anomalies}.`,
+    `Spending DNA type: ${a.dna.typeName} — ${a.dna.explanation}`,
   ].join(" ");
 }
-
-const COMPANION_VOICE = `You are MoneyDNA's Financial Companion — not a chatbot, not a financial advisor, a trusted companion who helps people understand the financial choices available to them. You never judge, shame, lecture, or command. You never say "you should" or "you need to" — say "you could" or "one possibility is". You never say "wrong" — say "another approach may lead to". You show possibilities and respect that the decision always belongs to the user. Every interaction should leave them feeling more hopeful and confident, never guilty.`;
 
 export async function answerCoachQuestion(
   question: string,
   analytics: AnalyticsResult,
-  history: { role: "user" | "assistant"; content: string }[]
+  history: { role: "user" | "assistant"; content: string }[],
+  memoryContext?: string
 ): Promise<string> {
-  // ---- Guardrails run first (safety + intelligence layer) ----
+  // ---- GUARDRAILS run first (safety + intelligence layer) ----
   const guard = guardrailFor(question);
   if (guard?.blockLLM && guard.response) {
     // Hard guardrail (e.g. crisis): return the safe reply without calling the model.
@@ -48,16 +49,14 @@ export async function answerCoachQuestion(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (apiKey) {
     try {
-      return await answerWithClaude(question, analytics, history, apiKey, guard?.systemNote);
+      return await answerWithClaude(question, analytics, history, apiKey, guard?.systemNote, memoryContext);
     } catch (err) {
-      // Log the real reason so failures are visible in the server console
-      // instead of silently degrading to the rule-based fallback.
       console.error("[coachEngine] Claude API call failed, falling back to rule-based engine:", err);
     }
   }
 
-  // If a soft guardrail applied but the model is unavailable, use a safe
-  // category fallback instead of the generic rule-based engine.
+  // If a soft guardrail applied but the model is unavailable, use a safe category
+  // fallback instead of the generic rule-based engine (which could over-advise).
   if (guard && !guard.blockLLM) return mdBoldToHtml(softFallback(guard.category, analytics));
 
   return ruleBasedAnswer(question, analytics);
@@ -68,11 +67,14 @@ async function answerWithClaude(
   analytics: AnalyticsResult,
   history: { role: "user" | "assistant"; content: string }[],
   apiKey: string,
-  guardNote?: string
+  guardNote?: string,
+  memoryContext?: string
 ): Promise<string> {
   const client = new Anthropic({ apiKey });
+  const base = `You are the Wealth Coach inside MoneyDNA AI, a personal/small-business finance app. Answer the user's question about their money using ONLY the financial summary below — be concrete, cite real numbers from it, and keep replies under 90 words. You are a warm, encouraging COMPANION, not a judge and not a licensed advisor: guide and educate, never dictate. Promote a strong saving culture (pay-yourself-first, automatic transfers, emergency funds). Use **double asterisks** for the 2-4 most important numbers/phrases so they render bold. Do not invent numbers not implied by the summary.`;
   const system =
-    `${COMPANION_VOICE} Answer the user's question about their money using ONLY the financial summary below — be concrete, cite real numbers from it, and keep replies under 90 words. Frame possibilities like pay-yourself-first, automatic transfers and emergency funds as options, not instructions. Use **double asterisks** for the 2-4 most important numbers/phrases so they render bold. Do not invent numbers not implied by the summary.` +
+    base +
+    (memoryContext ? `\n\n${memoryContext}` : "") +
     (guardNote ? `\n\n${guardNote}` : "") +
     `\n\nFINANCIAL SUMMARY:\n${summarize(analytics)}`;
 
@@ -90,20 +92,100 @@ async function answerWithClaude(
 function softFallback(category: GuardrailCategory, a: AnalyticsResult): string {
   switch (category) {
     case "REGULATED_ADVICE":
-      return `I can't point you to a specific product — I'm a guide, not a licensed advisor. What I can do is help you weigh the trade-offs (fees, risk, liquidity, whether it's CMA-regulated, and scam red flags). For a pick tailored to you, a licensed advisor is the right call.`;
+      return `I can't tell you to buy any specific product — I'm a guide, not a licensed advisor. What I can do is help you weigh the trade-offs (fees, risk, liquidity, whether it's CMA-regulated, and scam red-flags). For a specific pick tailored to you, a licensed advisor is the right call.`;
     case "BLIND_SPOT":
-      return `From the statement I can see, you kept **${a.savingsRate.toFixed(0)}%** this period. I only see this one statement though — not your other accounts, cash, SACCO, assets or any mobile loans — so treat this as a trendline, not your full net worth. Adding your other accounts would sharpen it.`;
+      return `From the statement I can see, you saved **${a.savingsRate.toFixed(0)}%** this period. But I only see this one statement — not your other accounts, cash, SACCO, assets or any mobile loans — so treat this as a trendline, not your full net worth. Add your other accounts and I'll sharpen it.`;
     case "FALSE_PRECISION":
-      return `I can't give an exact figure — the future depends on returns, income and life that nobody can predict. One possibility is a **range** with clear assumptions instead. Want me to sketch a low/likely/high path?`;
+      return `I can't give an exact figure — the future depends on returns, income and life that nobody can predict. I can show a **range** with clear assumptions instead. Want me to sketch a low/likely/high path?`;
     case "BLACK_TAX":
-      return `Supporting family is real and valid — the goal isn't to stop, it's to make it **intentional**. One possibility: deciding a set monthly family-support amount in advance so your own goals still get funded and giving stays a choice, not an unplanned leak.`;
+      return `Supporting family is real and valid — the goal isn't to stop, it's to make it **intentional**. Decide a set monthly family-support amount in advance so your own goals still get funded and giving stops being an unplanned leak.`;
     case "EMOTIONAL_DISTRESS":
-      return `That's a heavy feeling, and struggling with money is far more common than it looks — it's not a character flaw. One small step is enough for today. If it feels bigger than money alone, talking to someone you trust could really help.`;
+      return `That's a heavy feeling, and struggling with money is far more common than it looks — it's not a character flaw. Let's not fix everything today; just pick **one small step**. If it feels bigger than money alone, talking to someone you trust really helps.`;
     case "DEBT_TRAP":
-      return `If high-interest loans are in the mix, investing can wait — clearing them **is** the best return available. One possibility: pause new borrowing, list the balances, and put whatever you can toward the priciest one first, keeping just a small buffer. This is a cycle to break, not a failing.`;
+      return `If high-interest loans are in the mix, don't worry about investing yet — clearing them **is** your best return. Stop new borrowing, list the balances, and attack the priciest one first, keeping just a small buffer. This is a cycle to break, not a failing.`;
     default:
       return ruleBasedAnswer("", a);
   }
+}
+
+function ruleBasedAnswer(question: string, a: AnalyticsResult): string {
+  const k = question.toLowerCase().trim();
+  const b = (s: string) => `<b>${s}</b>`;
+
+  if (!a.hasData) {
+    return `I don't have a statement to read yet — upload one (or use the sample dataset) and I'll ground every answer in your real numbers.`;
+  }
+
+  if (/^(hi|hello|hey|sup|yo|good (morning|afternoon|evening))\b/.test(k) || k.length <= 3) {
+    return `Hey! I've read your ${a.periodLabel.toLowerCase()} statement — saved ${b(a.savingsRate.toFixed(0) + "%")} of income, health score ${b(a.health.score + "/100")}. Ask me about saving, spending, investing, or a goal — or tap a suggestion below.`;
+  }
+
+  if (/\binvest/.test(k)) {
+    const investCat = a.categories.find((c) => c.name === "Investments");
+    const idleCash = Math.max(0, a.kpis.net * 0.4);
+    return investCat
+      ? `You already put ${b(kes(investCat.amount))} into investments this month — solid. Beyond that, idle savings above your emergency-fund target could go into a money-market fund earning ~10%/year risk-free.`
+      : `You're not investing yet, but you saved ${b(kes(a.kpis.net))} this month. Once your emergency fund covers 3 months of expenses, moving surplus (roughly ${b(kes(idleCash) + "/month")}) into a money-market fund or index tracker is a solid next step — low effort, real growth.`;
+  }
+
+  if (/\bsav\w*/.test(k) && /\d/.test(k)) {
+    const target = parseInt(k.match(/\d[\d,]*/)?.[0].replace(/,/g, "") ?? "10000", 10);
+    const cat = a.categories[0];
+    return `To free up ${b(kes(target) + "/month")}: trimming ${cat ? cat.name : "your top category"} by 15% and cancelling one unused subscription gets you most of the way there. You're already saving ${b(a.savingsRate.toFixed(0) + "%")} of income — this would push it higher and compound to ${b(kes(target * 12))} a year.`;
+  }
+
+  if (/\bsav\w*/.test(k)) {
+    const cat = a.categories[0];
+    const headroom = Math.max(0, 30 - a.savingsRate);
+    return a.savingsRate >= 25
+      ? `You're already saving well — ${b(a.savingsRate.toFixed(0) + "%")} of income, above the 20% benchmark. To push further, ${cat ? `${cat.name} (${kes(cat.amount)})` : "your top category"} has the most room without touching essentials.`
+      : `Yes — a realistic next step is trimming ${cat ? b(cat.name) : "your top category"}${cat ? ` (${kes(cat.amount)})` : ""} by 10-15%. That alone could lift your savings rate by roughly ${b(headroom.toFixed(0) + " points")}, worth ${b(kes((headroom / 100) * a.kpis.income))} a month.`;
+  }
+
+  if (k.includes("where") || k.includes("going")) {
+    const top = a.categories.slice(0, 3).map((c) => `${c.name} (${kes(c.amount)})`).join(", ");
+    return `Your biggest outflows this month: ${b(top)}. ${a.anomalies.length ? `Worth a look: ${a.anomalies[0].title.toLowerCase()}.` : "Nothing unusual jumps out."}`;
+  }
+  if (k.includes("overspend")) {
+    return a.savingsRate >= 20
+      ? `You're ${b("not overspending overall")} — you saved ${a.savingsRate.toFixed(0)}% of income, above the 20% benchmark. ${a.anomalies.length ? `One pocket to watch: ${a.anomalies[0].title.toLowerCase()}.` : ""}`
+      : `Your savings rate is ${b(a.savingsRate.toFixed(0) + "%")}, below the 20% healthy benchmark — worth tightening ${a.categories[0]?.name ?? "your top category"}.`;
+  }
+  if (k.includes("continue") || k.includes("happen") || k.includes("lifestyle") || k.includes("future") || k.includes("projection")) {
+    const yearly = a.kpis.net * 12;
+    return `If you hold this exact pattern for 12 months, you'd save roughly ${b(kes(Math.max(0, yearly)))}. ${a.goals[0] ? `Redirect a little more toward ${a.goals[0].name} and you'd reach it faster.` : ""}`;
+  }
+  if (k.includes("cut") || k.includes("which expense") || k.includes("reduce") || k.includes("lower") || k.includes("trim")) {
+    const cats = a.categories.slice(1, 4).map((c) => c.name).join(", ");
+    return `I'd start with ${b(cats || "your discretionary categories")} — they're sizeable but usually have the most slack, with the least lifestyle impact.`;
+  }
+  if (k.includes("saving culture") || k.includes("habit") || k.includes("routine") || k.includes("discipline")) {
+    return `Building a saving culture is about automation: ${b("pay yourself first")} — move a fixed % to savings the moment income lands, keep an emergency fund growing (${a.goals.find((g) => /emergency/i.test(g.name)) ? "yours is underway" : "start one this month"}), then route any surplus into something that earns. Small, automatic, relentless.`;
+  }
+  if (k.includes("build") && !k.includes("business")) {
+    return `Building a saving culture is about automation: ${b("pay yourself first")} — move a fixed % to savings the moment income lands, keep an emergency fund growing, then route surplus into something that earns. Small, automatic, relentless.`;
+  }
+  if (k.includes("goal")) {
+    if (!a.goals.length) return `You don't have any savings goals set up yet — add one from the Dashboard ("+ New goal") and I'll track your progress and pace toward it.`;
+    const lines = a.goals.map((g) => `${g.name}: ${b(g.progressPct.toFixed(0) + "%")} there (${kes(g.current)} of ${kes(g.target)})`).join("; ");
+    return `Your goals: ${lines}. At this month's saving pace you're moving in the right direction — want me to work out how many months are left on any one of them?`;
+  }
+  if (k.includes("health") || k.includes("score")) {
+    const top = [...a.health.parts].sort((x, y) => y.value - x.value)[0];
+    const bottom = [...a.health.parts].sort((x, y) => x.value - y.value)[0];
+    return `Your financial health score is ${b(a.health.score + "/100")}. Strongest signal: ${b(top?.label ?? "savings behaviour")}. Weakest: ${b(bottom?.label ?? "spending volatility")} — that's the one to focus on next.`;
+  }
+  if (k.includes("net worth") || k.includes("networth")) {
+    return `Based on your cumulative saved cashflow so far, you're sitting around ${b(kes(a.netWorth))}. That's an estimate from your transaction history, not a full asset/liability picture — treat it as a savings trendline rather than a bank statement.`;
+  }
+  if (/make more money|earn more|increase (my )?income|side hustle|extra income/.test(k)) {
+    return `I can only see your spending side, not new income streams — that's a "you" call, not a numbers one. What I can say from your data: your biggest recurring drain is ${b(a.categories[0]?.name ?? "your top category")} (${kes(a.categories[0]?.amount ?? 0)}) — freeing that up has the same effect on your bottom line as earning more, without needing a new income source.`;
+  }
+  if (/^(can you |could you )?help( me)?\b|what can (you|i) (do|ask)|what do you do/.test(k)) {
+    return `I can answer things like: ${b("where is my money going")}, ${b("am I overspending")}, ${b("how can I save KES X monthly")}, ${b("what are my goals")}, or ${b("how healthy is my score")} — all grounded in your real ${a.periodLabel.toLowerCase()} data. Try one, or tap a suggestion below.`;
+  }
+
+  return `Not sure I've got a specific answer for "${question}" — but here's where things stand: income ${b(kes(a.kpis.income))}, expenses ${b(kes(a.kpis.expenses))}, saved ${b(kes(a.kpis.net) + ` (${a.savingsRate.toFixed(0)}%)`)}, health score ${b(a.health.score + "/100")}. Try asking about saving, investing, cutting costs, or a specific goal.`;
 }
 
 export interface DailyBriefing {
@@ -176,88 +258,4 @@ function ruleBasedAdvice(a: AnalyticsResult): string {
     return `One possibility: your savings rate is <b>${a.savingsRate.toFixed(0)}%</b> — even a small automatic transfer could move it closer to the 20% benchmark over time.`;
   }
   return `You're doing well — your <b>${a.streakMonths}-month</b> saving streak is something worth celebrating today.`;
-}
-
-function ruleBasedAnswer(question: string, a: AnalyticsResult): string {
-  const k = question.toLowerCase().trim();
-  const b = (s: string) => `<b>${s}</b>`;
-
-  if (!a.hasData) {
-    return `I don't have a statement to read yet — upload one (or use the sample dataset) and I'll ground every answer in your real numbers.`;
-  }
-
-  // Greeting — short, friendly, doesn't dump the full summary.
-  if (/^(hi|hello|hey|sup|yo|good (morning|afternoon|evening))\b/.test(k) || k.length <= 3) {
-    return `Hey! I've read your ${a.periodLabel.toLowerCase()} statement — you kept ${b(a.savingsRate.toFixed(0) + "%")} of income, health score ${b(a.health.score + "/100")}. Ask me about saving, spending, investing, or a goal — or tap a suggestion below.`;
-  }
-
-  // Investing
-  if (/\binvest/.test(k)) {
-    const investCat = a.categories.find((c) => c.name === "Investments");
-    const idleCash = Math.max(0, a.kpis.net * 0.4);
-    return investCat
-      ? `You're already putting ${b(kes(investCat.amount))} into investments this month — that's real momentum. Beyond that, one possibility once your emergency fund is solid: idle savings could go into a money-market fund earning roughly 10%/year.`
-      : `You haven't started investing yet, and that's completely fine — you kept ${b(kes(a.kpis.net))} this month. One possibility, once your emergency fund covers a few months of expenses: routing surplus (roughly ${b(kes(idleCash) + "/month")}) into a money-market fund or index tracker. No pressure — just an option worth knowing about.`;
-  }
-
-  // Explicit target amount ("save KES 10,000 monthly")
-  if (/\bsav\w*/.test(k) && /\d/.test(k)) {
-    const target = parseInt(k.match(/\d[\d,]*/)?.[0].replace(/,/g, "") ?? "10000", 10);
-    const cat = a.categories[0];
-    return `One possibility to free up ${b(kes(target) + "/month")}: trimming ${cat ? cat.name : "your top category"} by around 15%, plus reviewing one subscription you may not need. You're already keeping ${b(a.savingsRate.toFixed(0) + "%")} of income — this could push that higher, compounding to roughly ${b(kes(target * 12))} over a year.`;
-  }
-
-  // General "can I save more / saving more / how to save" — no specific number given.
-  if (/\bsav\w*/.test(k)) {
-    const cat = a.categories[0];
-    const headroom = Math.max(0, 30 - a.savingsRate);
-    return a.savingsRate >= 25
-      ? `You're already doing well here — ${b(a.savingsRate.toFixed(0) + "%")} of income kept, above the 20% benchmark. If you wanted to push further, ${cat ? `${cat.name} (${kes(cat.amount)})` : "your top category"} has the most room without touching the essentials.`
-      : `One possibility: trimming ${cat ? b(cat.name) : "your top category"}${cat ? ` (${kes(cat.amount)})` : ""} by around 10-15%. That alone could lift your savings rate by roughly ${b(headroom.toFixed(0) + " points")} — worth ${b(kes((headroom / 100) * a.kpis.income))} a month if it fits your life right now.`;
-  }
-
-  if (k.includes("where") || k.includes("going")) {
-    const top = a.categories.slice(0, 3).map((c) => `${c.name} (${kes(c.amount)})`).join(", ");
-    return `Your biggest outflows this month: ${b(top)}. ${a.anomalies.length ? `One thing worth a look: ${a.anomalies[0].title.toLowerCase()}.` : "Nothing unusual jumps out."}`;
-  }
-  if (k.includes("overspend")) {
-    return a.savingsRate >= 20
-      ? `From what I can see, things look ${b("on track overall")} — you kept ${a.savingsRate.toFixed(0)}% of income, above the 20% benchmark. ${a.anomalies.length ? `One pocket worth watching: ${a.anomalies[0].title.toLowerCase()}.` : ""}`
-      : `Your savings rate is ${b(a.savingsRate.toFixed(0) + "%")}, below the 20% benchmark — one option worth considering is easing up on ${a.categories[0]?.name ?? "your top category"}, if that feels doable.`;
-  }
-  if (k.includes("continue") || k.includes("happen") || k.includes("lifestyle") || k.includes("future") || k.includes("projection")) {
-    const yearly = a.kpis.net * 12;
-    return `If this exact pattern continued for 12 months, you'd likely keep roughly ${b(kes(Math.max(0, yearly)))}. ${a.goals[0] ? `Putting a little more toward ${a.goals[0].name} could get you there sooner.` : ""}`;
-  }
-  if (k.includes("cut") || k.includes("which expense") || k.includes("reduce") || k.includes("lower") || k.includes("trim")) {
-    const cats = a.categories.slice(1, 4).map((c) => c.name).join(", ");
-    return `One place worth a look: ${b(cats || "your discretionary categories")} — they're sizeable, and often have the most room without much lifestyle impact.`;
-  }
-  if (k.includes("saving culture") || k.includes("habit") || k.includes("routine") || k.includes("discipline")) {
-    return `One approach that tends to work well: automation — ${b("paying yourself first")} by moving a fixed % to savings the moment income lands, growing an emergency fund (${a.goals.find((g) => /emergency/i.test(g.name)) ? "yours is already underway" : "starting one whenever feels right"}), then letting any surplus go toward something that earns. Small and automatic beats willpower alone.`;
-  }
-  if (k.includes("build") && !k.includes("business")) {
-    return `One approach that tends to work well: automation — ${b("paying yourself first")} by moving a fixed % to savings the moment income lands, growing an emergency fund, then routing surplus into something that earns. Small and automatic beats willpower alone.`;
-  }
-  if (k.includes("goal")) {
-    if (!a.goals.length) return `You don't have any savings goals set up yet — whenever you're ready, add one from the Dashboard ("+ New goal") and I'll track your progress and pace toward it.`;
-    const lines = a.goals.map((g) => `${g.name}: ${b(g.progressPct.toFixed(0) + "%")} there (${kes(g.current)} of ${kes(g.target)})`).join("; ");
-    return `Your goals: ${lines}. At this month's pace you're moving in the right direction — want me to work out how many months are left on any one of them?`;
-  }
-  if (k.includes("health") || k.includes("score")) {
-    const top = [...a.health.parts].sort((x, y) => y.value - x.value)[0];
-    const bottom = [...a.health.parts].sort((x, y) => x.value - y.value)[0];
-    return `Your financial health score is ${b(a.health.score + "/100")}. Strongest signal: ${b(top?.label ?? "savings behaviour")}. The one with the most room to grow: ${b(bottom?.label ?? "spending volatility")}.`;
-  }
-  if (k.includes("net worth") || k.includes("networth")) {
-    return `Based on your cumulative saved cashflow so far, you're sitting around ${b(kes(a.netWorth))}. That's an estimate from your transaction history, not a full asset/liability picture — think of it as a savings trendline rather than a bank statement.`;
-  }
-  if (/make more money|earn more|increase (my )?income|side hustle|extra income/.test(k)) {
-    return `I can only see your spending side, not new income streams — that's a decision that belongs entirely to you. What I can share from your data: your biggest recurring outflow is ${b(a.categories[0]?.name ?? "your top category")} (${kes(a.categories[0]?.amount ?? 0)}) — freeing that up could have a similar effect on your bottom line as earning more, without needing a new income source.`;
-  }
-  if (/^(can you |could you )?help( me)?\b|what can (you|i) (do|ask)|what do you do/.test(k)) {
-    return `I can help with things like: ${b("where is my money going")}, ${b("am I overspending")}, ${b("how could I save KES X monthly")}, ${b("what are my goals")}, or ${b("how healthy is my score")} — all grounded in your real ${a.periodLabel.toLowerCase()} data. Try one, or tap a suggestion below.`;
-  }
-
-  return `I don't have a specific answer for "${question}" yet — but here's where things stand: income ${b(kes(a.kpis.income))}, expenses ${b(kes(a.kpis.expenses))}, kept ${b(kes(a.kpis.net) + ` (${a.savingsRate.toFixed(0)}%)`)}, health score ${b(a.health.score + "/100")}. Try asking about saving, investing, cutting costs, or a specific goal.`;
 }

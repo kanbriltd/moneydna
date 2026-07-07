@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import Particles from "@/components/ui/Particles";
 import Logo from "@/components/ui/Logo";
@@ -43,7 +44,8 @@ const btnSecondary: React.CSSProperties = {
 
 export default async function LandingPage() {
   const session = await auth();
-  const appHref = session?.user ? "/dashboard" : "/login";
+  if (session?.user) redirect("/today");
+  const appHref = "/login";
 
   return (
     <div className="md-page-bg">
